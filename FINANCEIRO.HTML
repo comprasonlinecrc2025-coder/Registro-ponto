@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oficial de Registro Civil - Sistema Financeiro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Tela de Login */
+        .login-container {
+            max-width: 450px;
+            margin: 50px auto;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .company-badge {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 12px;
+            color: #555;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #f0f0f0;
+            color: #666;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .info-box strong {
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .password-requirements {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+
+        .requirement {
+            color: #666;
+            margin: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .requirement::before {
+            content: "•";
+            position: absolute;
+            left: 5px;
+            color: #667eea;
+        }
+
+        .requirement.met {
+            color: #28a745;
+        }
+
+        .requirement.met::before {
+            content: "✓";
+            color: #28a745;
+        }
+
+        /* Sistema Principal */
+        .main-header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .company-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .user-header {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 25px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #555;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: #1e3c72;
+            color: white;
+        }
+
+        .main-content {
+            display: none;
+        }
+
+        .main-content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #1e3c72;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #1e3c72;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        .badge-admin { background: #dc3545; color: white; }
+        .badge-user { background: #28a745; color: white; }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-warning { background: #fff3cd; color: #856404; }
+        .alert-danger { background: #f8d7da; color: #721c24; }
+        .alert-info { background: #d1ecf1; color: #0c5460; }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: white;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // ===== AUTENTICAÇÃO OFUSCADA DO CARTÓRIO =====
+        (function() {
+            // Senha ofuscada: Registroponto51374@
+            // Convertida para códigos charCode para não aparecer diretamente
+            const senhaOfuscada = [82, 101, 103, 105, 115, 116, 114, 111, 112, 111, 110, 116, 111, 53, 49, 51, 55, 52, 64];
+            const senhaCorreta = senhaOfuscada.map(c => String.fromCharCode(c)).join('');
+            
+            // Verifica se já está autenticado nesta sessão
+            if (!sessionStorage.getItem('acessoCartorio')) {
+                const senhaDigitada = prompt("🔐 ACESSO RESTRITO AO CARTÓRIO\nDigite a senha de acesso:");
+                
+                if (senhaDigitada !== senhaCorreta) {
+                    document.body.innerHTML = `
+                        <div style="text-align: center; margin-top: 100px; font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+                            <div style="background: white; max-width: 400px; margin: 0 auto; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                                <h1 style="color: #dc3545; margin-bottom: 20px;">⛔ Acesso Negado</h1>
+                                <p style="color: #666; margin: 20px 0;">Esta área é restrita aos funcionários do cartório.</p>
+                                <button onclick="location.reload()" style="background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px;">
+                                    Tentar novamente
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    throw new Error("Acesso negado");
+                }
+                
+                // Marca como autenticado para a sessão
+                sessionStorage.setItem('acessoCartorio', 'true');
+            }
+        })();
+    </script>
+
+    <div class="container">
+        <!-- TELA DE LOGIN ADMIN -->
+        <div id="loginScreen" class="login-container">
+            <div class="login-card">
+                <div class="header">
+                    <h1>🏢 Oficial de Registro Civil</h1>
+                    <p>Mogi das Cruzes - CNPJ: 51.374.270/0001-01</p>
+                    <div class="company-badge">
+                        Sistema Administrativo
+                    </div>
+                </div>
+
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="mudarTabLogin('login')">🔐 Login Admin</button>
+                    <button class="tab-btn" onclick="mudarTabLogin('primeiroAcesso')">🆕 Primeiro Acesso</button>
+                </div>
+
+                <!-- Aba Login Admin -->
+                <div id="tab-login" class="tab-content active">
+                    <form onsubmit="fazerLogin(event)">
+                        <div class="form-group">
+                            <label>Usuário Admin</label>
+                            <div class="input-group">
+                                <span class="input-icon">👤</span>
+                                <input type="text" id="loginUsername" class="form-control" placeholder="Digite seu usuário" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Senha</label>
+                            <div class="input-group">
+                                <span class="input-icon">🔑</span>
+                                <input type="password" id="loginPassword" class="form-control" placeholder="Digite sua senha" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-login">Entrar no Sistema</button>
+                    </form>
+
+                    <div class="info-box" id="loginInfoBox">
+                        <strong>🔑 Primeiro acesso?</strong>
+                        <p>Clique em "Primeiro Acesso" para criar o administrador.</p>
+                    </div>
+                </div>
+
+                <!-- Aba Primeiro Acesso (criar admin) -->
+                <div id="tab-primeiroAcesso" class="tab-content">
+                    <form onsubmit="criarPrimeiroAcesso(event)">
+                        <div class="form-group">
+                            <label>Nome Completo</label>
+                            <div class="input-group">
+                                <span class="input-icon">👤</span>
+                                <input type="text" id="primeiroNome" class="form-control" placeholder="Seu nome completo" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Usuário Admin</label>
+                            <div class="input-group">
+                                <span class="input-icon">📧</span>
+                                <input type="text" id="primeiroUsuario" class="form-control" placeholder="Escolha seu usuário" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Senha</label>
+                            <div class="input-group">
+                                <span class="input-icon">🔒</span>
+                                <input type="password" id="primeiroSenha" class="form-control" placeholder="Crie uma senha" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Confirmar Senha</label>
+                            <div class="input-group">
+                                <span class="input-icon">✓</span>
+                                <input type="password" id="primeiroConfirmarSenha" class="form-control" placeholder="Digite a senha novamente" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-login">Criar Administrador</button>
+                    </form>
+
+                    <div class="info-box" style="margin-top: 20px;">
+                        <strong>⚠️ Primeiro Acesso:</strong>
+                        <p>• Você criará o administrador principal</p>
+                        <p>• Depois de criar, faça login</p>
+                    </div>
+                </div>
+
+                <div id="alertContainer"></div>
+            </div>
+        </div>
+
+        <!-- SISTEMA PRINCIPAL (ADMIN) -->
+        <div id="mainSystem" style="display: none;">
+            <!-- Header -->
+            <div class="main-header">
+                <h1>🏢 Oficial de Registro Civil - Mogi das Cruzes</h1>
+                <p>Sistema Administrativo</p>
+                <div class="company-info">
+                    <span>CNPJ: 51.374.270/0001-01</span>
+                    <span id="userInfo"></span>
+                </div>
+            </div>
+
+            <!-- User Info -->
+            <div class="user-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3>👤 Admin: <span id="loggedUserName"></span></h3>
+                    </div>
+                    <button class="btn btn-danger" onclick="logout()">Sair</button>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="mudarTabSistema('dashboard')">📊 Dashboard</button>
+                <button class="tab" onclick="mudarTabSistema('funcionarios')">👥 Funcionários</button>
+                <button class="tab" onclick="mudarTabSistema('registros')">📋 Registros</button>
+                <button class="tab" onclick="mudarTabSistema('faltas')">❌ Faltas</button>
+                <button class="tab" onclick="mudarTabSistema('ferias')">🏖️ Férias</button>
+                <button class="tab" onclick="mudarTabSistema('licencas')">📄 Licenças</button>
+                <button class="tab" onclick="mudarTabSistema('financeiro')">💰 Financeiro</button>
+                <button class="tab" onclick="mudarTabSistema('usuarios')">🔑 Admin</button>
+            </div>
+
+            <!-- DASHBOARD -->
+            <div id="sistema-dashboard" class="main-content active">
+                <div class="card">
+                    <h2>📊 Dashboard</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Funcionários Ativos</h3>
+                            <div class="value" id="totalFuncionarios">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Presentes Hoje</h3>
+                            <div class="value" id="presentesHoje">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Faltas Hoje</h3>
+                            <div class="value" id="faltasHoje">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Com senha</h3>
+                            <div class="value" id="comSenha">0</div>
+                        </div>
+                    </div>
+
+                    <h3>Últimos Registros</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Funcionário</th>
+                                    <th>Entrada</th>
+                                    <th>Almoço</th>
+                                    <th>Volta</th>
+                                    <th>Saída</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ultimosRegistros">
+                                <tr><td colspan="6" style="text-align: center;">Nenhum registro</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FUNCIONÁRIOS - COM MATRÍCULA E EMAIL -->
+            <div id="sistema-funcionarios" class="main-content">
+                <div class="card">
+                    <h2>👥 Cadastro de Funcionários</h2>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+                        <h3>Novo Funcionário</h3>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Nome Completo:</label>
+                                <input type="text" id="novoFuncionarioNome" class="form-control" placeholder="Digite o nome completo">
+                            </div>
+                            <div class="form-group">
+                                <label>CPF (11 dígitos):</label>
+                                <input type="text" id="novoFuncionarioCpf" class="form-control" placeholder="Apenas números" maxlength="11" onkeypress="return onlyNumbers(event)">
+                            </div>
+                            <div class="form-group">
+                                <label>Matrícula:</label>
+                                <input type="text" id="novoFuncionarioMatricula" class="form-control" placeholder="Número da matrícula">
+                            </div>
+                            <div class="form-group">
+                                <label>E-mail:</label>
+                                <input type="email" id="novoFuncionarioEmail" class="form-control" placeholder="email@exemplo.com">
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="cadastrarFuncionario()">Cadastrar Funcionário</button>
+                    </div>
+
+                    <h3>Funcionários Cadastrados</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Matrícula</th>
+                                    <th>CPF</th>
+                                    <th>Nome</th>
+                                    <th>E-mail</th>
+                                    <th>Senha</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaFuncionarios">
+                                <tr><td colspan="7" style="text-align: center;">Nenhum funcionário cadastrado</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REGISTROS -->
+            <div id="sistema-registros" class="main-content">
+                <div class="card">
+                    <h2>📋 Registros de Ponto</h2>
+                    
+                    <div class="grid-2" style="margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label>Data Início:</label>
+                            <input type="date" id="filtroDataInicio" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Data Fim:</label>
+                            <input type="date" id="filtroDataFim" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Funcionário:</label>
+                            <select id="filtroFuncionario" class="form-control">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: flex-end; gap: 10px;">
+                            <button class="btn btn-primary" onclick="filtrarRegistros()">Filtrar</button>
+                            <button class="btn btn-success" onclick="exportarCSV()">📥 CSV</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Matrícula</th>
+                                    <th>CPF</th>
+                                    <th>Nome</th>
+                                    <th>Entrada</th>
+                                    <th>Almoço</th>
+                                    <th>Volta</th>
+                                    <th>Saída</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaRegistros">
+                                <tr><td colspan="8" style="text-align: center;">Nenhum registro</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FALTAS -->
+            <div id="sistema-faltas" class="main-content">
+                <div class="card">
+                    <h2>❌ Controle de Faltas</h2>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+                        <h3>Registrar Falta</h3>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Funcionário:</label>
+                                <select id="faltaFuncionario" class="form-control">
+                                    <option value="">Selecione</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Data da Falta:</label>
+                                <input type="date" id="faltaData" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Tipo:</label>
+                                <select id="faltaTipo" class="form-control">
+                                    <option value="nao_justificada">Não Justificada</option>
+                                    <option value="justificada">Justificada</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Motivo:</label>
+                                <input type="text" id="faltaMotivo" class="form-control" placeholder="Motivo da falta">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" style="margin-top: 20px;" onclick="registrarFalta()">Registrar Falta</button>
+                    </div>
+
+                    <h3>Histórico de Faltas</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Funcionário</th>
+                                    <th>Tipo</th>
+                                    <th>Motivo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaFaltas">
+                                <tr><td colspan="4" style="text-align: center;">Nenhuma falta</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FÉRIAS -->
+            <div id="sistema-ferias" class="main-content">
+                <div class="card">
+                    <h2>🏖️ Controle de Férias</h2>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+                        <h3>Cadastrar Período de Férias</h3>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Funcionário:</label>
+                                <select id="feriasFuncionario" class="form-control">
+                                    <option value="">Selecione</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Período Aquisitivo:</label>
+                                <input type="text" id="feriasPeriodo" class="form-control" placeholder="Ex: 2024/2025">
+                            </div>
+                            <div class="form-group">
+                                <label>Data Início:</label>
+                                <input type="date" id="feriasInicio" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Data Fim:</label>
+                                <input type="date" id="feriasFim" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Dias:</label>
+                                <input type="number" id="feriasDias" class="form-control" value="30">
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="cadastrarFerias()">Cadastrar Férias</button>
+                    </div>
+
+                    <h3>Férias Programadas</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Funcionário</th>
+                                    <th>Período</th>
+                                    <th>Início</th>
+                                    <th>Fim</th>
+                                    <th>Dias</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaFerias">
+                                <tr><td colspan="5" style="text-align: center;">Nenhum registro</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LICENÇAS -->
+            <div id="sistema-licencas" class="main-content">
+                <div class="card">
+                    <h2>📄 Controle de Licenças</h2>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+                        <h3>Registrar Licença</h3>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Funcionário:</label>
+                                <select id="licencaFuncionario" class="form-control">
+                                    <option value="">Selecione</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Tipo de Licença:</label>
+                                <select id="licencaTipo" class="form-control">
+                                    <option value="medica">Licença Médica</option>
+                                    <option value="maternidade">Licença Maternidade</option>
+                                    <option value="paternidade">Licença Paternidade</option>
+                                    <option value="casamento">Licença Casamento</option>
+                                    <option value="luto">Licença Luto</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Data Início:</label>
+                                <input type="date" id="licencaInicio" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Data Fim:</label>
+                                <input type="date" id="licencaFim" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Dias:</label>
+                                <input type="number" id="licencaDias" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Motivo:</label>
+                                <input type="text" id="licencaMotivo" class="form-control" placeholder="Motivo da licença">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" style="margin-top: 20px;" onclick="registrarLicenca()">Registrar Licença</button>
+                    </div>
+
+                    <h3>Licenças Registradas</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Funcionário</th>
+                                    <th>Tipo</th>
+                                    <th>Período</th>
+                                    <th>Dias</th>
+                                    <th>Motivo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaLicencas">
+                                <tr><td colspan="5" style="text-align: center;">Nenhum registro</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FINANCEIRO -->
+            <div id="sistema-financeiro" class="main-content">
+                <div class="card">
+                    <h2>💰 Controle Financeiro</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #11998e, #38ef7d);">
+                            <h3>Total Horas</h3>
+                            <div class="value" id="financeiroTotalHoras">0h</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #ee0979, #ff6a00);">
+                            <h3>Horas Extras</h3>
+                            <div class="value" id="financeiroHorasExtras">0h</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #4568DC, #B06AB3);">
+                            <h3>Valor Extras</h3>
+                            <div class="value" id="financeiroValorExtras">R$ 0</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #f12711, #f5af19);">
+                            <h3>Descontos</h3>
+                            <div class="value" id="financeiroDescontos">R$ 0</div>
+                        </div>
+                    </div>
+
+                    <h3>Relatório por Funcionário</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Funcionário</th>
+                                    <th>Dias</th>
+                                    <th>Faltas</th>
+                                    <th>Extras</th>
+                                    <th>Valor</th>
+                                    <th>Descontos</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaFinanceiro">
+                                <tr><td colspan="7" style="text-align: center;">Sem dados</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- USUÁRIOS ADMIN -->
+            <div id="sistema-usuarios" class="main-content">
+                <div class="card">
+                    <h2>🔑 Gerenciar Admins</h2>
+                    
+                    <div id="formNovoUsuario" style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+                        <h3>Criar Novo Admin</h3>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Usuário:</label>
+                                <input type="text" id="novoUsuarioUser" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Senha:</label>
+                                <input type="password" id="novoUsuarioSenha" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Nome:</label>
+                                <input type="text" id="novoUsuarioNome" class="form-control">
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="criarUsuario()">Criar Admin</button>
+                    </div>
+
+                    <h3>Admins do Sistema</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Usuário</th>
+                                    <th>Nome</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaUsuarios"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Confirmação -->
+        <div id="modalExcluir" class="modal">
+            <div class="modal-content">
+                <h3>⚠️ Confirmar Exclusão</h3>
+                <p id="modalMensagem">Tem certeza?</p>
+                <div class="modal-buttons">
+                    <button class="btn btn-danger" id="confirmarExcluir">Sim</button>
+                    <button class="btn btn-primary" onclick="fecharModal()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Recuperação de Senha -->
+        <div id="modalRecuperarSenha" class="modal">
+            <div class="modal-content">
+                <h3>🔐 Recuperar Senha</h3>
+                <p id="recuperarMensagem"></p>
+                <div class="form-group">
+                    <label>Nova Senha:</label>
+                    <input type="password" id="recuperarNovaSenha" class="form-control" placeholder="Digite a nova senha">
+                </div>
+                <div class="form-group">
+                    <label>Confirmar Senha:</label>
+                    <input type="password" id="recuperarConfirmarSenha" class="form-control" placeholder="Confirme a nova senha">
+                </div>
+                <div class="modal-buttons">
+                    <button class="btn btn-success" id="confirmarRecuperar">Salvar</button>
+                    <button class="btn btn-danger" onclick="fecharModalRecuperar()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Sistema Administrativo v6.0 - Acesso Restrito</div>
+    </div>
+
+    <script>
+        // Função para permitir apenas números
+        window.onlyNumbers = (e) => {
+            const charCode = (e.which) ? e.which : e.keyCode;
+            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                return false;
+            }
+            return true;
+        };
+
+        // ========== VALIDAÇÃO DE CPF (ALGORITMO OFICIAL DA RECEITA FEDERAL) ==========
+        function validarCPF(cpf) {
+            cpf = cpf.replace(/\D/g, '');
+            if (cpf.length !== 11) return false;
+            if (/^(\d)\1+$/.test(cpf)) return false;
+            
+            let soma = 0;
+            for (let i = 0; i < 9; i++) soma += parseInt(cpf.charAt(i)) * (10 - i);
+            let resto = (soma * 10) % 11;
+            let digito1 = (resto === 10 || resto === 11) ? 0 : resto;
+            if (digito1 !== parseInt(cpf.charAt(9))) return false;
+            
+            soma = 0;
+            for (let i = 0; i < 10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
+            resto = (soma * 10) % 11;
+            let digito2 = (resto === 10 || resto === 11) ? 0 : resto;
+            if (digito2 !== parseInt(cpf.charAt(10))) return false;
+            
+            return true;
+        }
+
+        // ========== VALIDAÇÃO DE EMAIL ==========
+        function validarEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        // ==================== SISTEMA COMPLETO ====================
+        class SistemaCompleto {
+            constructor() {
+                this.usuarioAtual = null;
+                this.usuarios = [];
+                this.funcionarios = [];
+                this.registros = [];
+                this.faltas = [];
+                this.ferias = [];
+                this.licencas = [];
+                this.funcionarioParaExcluir = null;
+                this.funcionarioRecuperar = null;
+                
+                this.carregarDados();
+                this.verificarPrimeiroAcesso();
+                this.verificarSessao();
+            }
+
+            carregarDados() {
+                const users = localStorage.getItem('usuariosAdmin');
+                this.usuarios = users ? JSON.parse(users) : [];
+                
+                const funcs = localStorage.getItem('funcionarios');
+                this.funcionarios = funcs ? JSON.parse(funcs) : [];
+                
+                this.registros = JSON.parse(localStorage.getItem('registrosPonto')) || [];
+                this.faltas = JSON.parse(localStorage.getItem('faltas')) || [];
+                this.ferias = JSON.parse(localStorage.getItem('ferias')) || [];
+                this.licencas = JSON.parse(localStorage.getItem('licencas')) || [];
+            }
+
+            salvarDados() {
+                localStorage.setItem('usuariosAdmin', JSON.stringify(this.usuarios));
+                localStorage.setItem('funcionarios', JSON.stringify(this.funcionarios));
+                localStorage.setItem('registrosPonto', JSON.stringify(this.registros));
+                localStorage.setItem('faltas', JSON.stringify(this.faltas));
+                localStorage.setItem('ferias', JSON.stringify(this.ferias));
+                localStorage.setItem('licencas', JSON.stringify(this.licencas));
+            }
+
+            verificarPrimeiroAcesso() {
+                const infoBox = document.getElementById('loginInfoBox');
+                if (this.usuarios.length === 0 && infoBox) {
+                    infoBox.innerHTML = `
+                        <strong>🎉 Primeiro acesso!</strong>
+                        <p>Clique em "Primeiro Acesso" para criar o administrador.</p>
+                    `;
+                }
+            }
+
+            verificarSessao() {
+                const savedUser = localStorage.getItem('usuarioLogado');
+                if (savedUser) {
+                    this.usuarioAtual = JSON.parse(savedUser);
+                    this.mostrarSistemaPrincipal();
+                }
+            }
+
+            // ========== LOGIN ADMIN ==========
+            criarPrimeiroAcesso(dados) {
+                if (this.usuarios.length > 0) {
+                    this.mostrarAlerta('Já existe admin! Faça login.', 'warning', 'login');
+                    return false;
+                }
+
+                if (dados.password !== dados.confirmPassword) {
+                    this.mostrarAlerta('Senhas não coincidem!', 'warning', 'login');
+                    return false;
+                }
+
+                const novoUsuario = {
+                    id: 1,
+                    username: dados.username,
+                    password: dados.password,
+                    nome: dados.nome
+                };
+
+                this.usuarios.push(novoUsuario);
+                this.salvarDados();
+
+                this.mostrarAlerta('✅ Admin criado! Faça login.', 'success', 'login');
+                
+                document.getElementById('primeiroNome').value = '';
+                document.getElementById('primeiroUsuario').value = '';
+                document.getElementById('primeiroSenha').value = '';
+                document.getElementById('primeiroConfirmarSenha').value = '';
+                
+                setTimeout(() => {
+                    mudarTabLogin('login');
+                }, 2000);
+
+                return true;
+            }
+
+            fazerLogin(username, password) {
+                const usuario = this.usuarios.find(u => u.username === username && u.password === password);
+
+                if (usuario) {
+                    this.usuarioAtual = usuario;
+                    localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
+                    this.mostrarAlerta('Login realizado!', 'success', 'login');
+                    this.mostrarSistemaPrincipal();
+                    return true;
+                } else {
+                    this.mostrarAlerta('Usuário ou senha inválidos!', 'danger', 'login');
+                    return false;
+                }
+            }
+
+            logout() {
+                this.usuarioAtual = null;
+                localStorage.removeItem('usuarioLogado');
+                document.getElementById('loginScreen').style.display = 'block';
+                document.getElementById('mainSystem').style.display = 'none';
+                mudarTabLogin('login');
+            }
+
+            mostrarSistemaPrincipal() {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainSystem').style.display = 'block';
+                
+                document.getElementById('loggedUserName').textContent = this.usuarioAtual.nome;
+                document.getElementById('userInfo').textContent = `Admin: ${this.usuarioAtual.nome}`;
+                
+                this.atualizarTodasTelas();
+                this.atualizarSelects();
+            }
+
+            mostrarAlerta(mensagem, tipo, origem = 'sistema') {
+                const container = document.getElementById('alertContainer');
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${tipo}`;
+                alert.textContent = mensagem;
+                
+                container.innerHTML = '';
+                container.appendChild(alert);
+                
+                setTimeout(() => alert.remove(), 3000);
+            }
+
+            // ========== FUNCIONÁRIOS ==========
+            atualizarSelects() {
+                const selects = [
+                    'filtroFuncionario', 
+                    'faltaFuncionario', 
+                    'feriasFuncionario', 
+                    'licencaFuncionario'
+                ];
+                
+                selects.forEach(id => {
+                    const select = document.getElementById(id);
+                    if (select) {
+                        select.innerHTML = '<option value="">Selecione</option>';
+                        this.funcionarios.filter(f => f.ativo !== false).forEach(func => {
+                            select.innerHTML += `<option value="${func.cpf}">${func.matricula || ''} - ${func.nome}</option>`;
+                        });
+                    }
+                });
+            }
+
+            cadastrarFuncionario() {
+                if (!this.usuarioAtual) return;
+                
+                const nome = document.getElementById('novoFuncionarioNome').value;
+                const cpf = document.getElementById('novoFuncionarioCpf').value;
+                const matricula = document.getElementById('novoFuncionarioMatricula').value;
+                const email = document.getElementById('novoFuncionarioEmail').value;
+                
+                if (!nome || !cpf || !matricula || !email) {
+                    this.mostrarAlerta('Preencha todos os campos!', 'warning');
+                    return;
+                }
+
+                if (!validarCPF(cpf)) {
+                    this.mostrarAlerta('CPF inválido!', 'danger');
+                    return;
+                }
+
+                if (!validarEmail(email)) {
+                    this.mostrarAlerta('E-mail inválido!', 'danger');
+                    return;
+                }
+                
+                if (this.funcionarios.some(f => f.cpf === cpf)) {
+                    this.mostrarAlerta('CPF já cadastrado!', 'warning');
+                    return;
+                }
+
+                if (this.funcionarios.some(f => f.matricula === matricula)) {
+                    this.mostrarAlerta('Matrícula já cadastrada!', 'warning');
+                    return;
+                }
+                
+                const novo = { 
+                    cpf, 
+                    nome, 
+                    matricula,
+                    email,
+                    senha: null,
+                    ativo: true,
+                    dataCadastro: new Date().toISOString()
+                };
+                
+                this.funcionarios.push(novo);
+                this.salvarDados();
+                this.atualizarListaFuncionarios();
+                this.atualizarSelects();
+                this.atualizarDashboard();
+                this.mostrarAlerta('Funcionário cadastrado!', 'success');
+                
+                document.getElementById('novoFuncionarioNome').value = '';
+                document.getElementById('novoFuncionarioCpf').value = '';
+                document.getElementById('novoFuncionarioMatricula').value = '';
+                document.getElementById('novoFuncionarioEmail').value = '';
+            }
+
+            excluirFuncionario(cpf) {
+                this.funcionarios = this.funcionarios.filter(f => f.cpf !== cpf);
+                this.salvarDados();
+                this.atualizarListaFuncionarios();
+                this.atualizarSelects();
+                this.mostrarAlerta('Funcionário excluído!', 'success');
+            }
+
+            toggleFuncionarioStatus(cpf) {
+                const func = this.funcionarios.find(f => f.cpf === cpf);
+                if (func) {
+                    func.ativo = !func.ativo;
+                    this.salvarDados();
+                    this.atualizarListaFuncionarios();
+                    this.atualizarSelects();
+                }
+            }
+
+            // ========== RECUPERAÇÃO DE SENHA ==========
+            abrirModalRecuperar(cpf, nome) {
+                this.funcionarioRecuperar = cpf;
+                document.getElementById('recuperarMensagem').innerHTML = `Recuperar senha de <strong>${nome}</strong>`;
+                document.getElementById('modalRecuperarSenha').style.display = 'block';
+            }
+
+            fecharModalRecuperar() {
+                document.getElementById('modalRecuperarSenha').style.display = 'none';
+                document.getElementById('recuperarNovaSenha').value = '';
+                document.getElementById('recuperarConfirmarSenha').value = '';
+                this.funcionarioRecuperar = null;
+            }
+
+            salvarNovaSenha() {
+                const novaSenha = document.getElementById('recuperarNovaSenha').value;
+                const confirmarSenha = document.getElementById('recuperarConfirmarSenha').value;
+                
+                if (!novaSenha || !confirmarSenha) {
+                    this.mostrarAlerta('Preencha todos os campos!', 'warning');
+                    return;
+                }
+
+                if (novaSenha.length < 6) {
+                    this.mostrarAlerta('Senha deve ter 6+ caracteres!', 'warning');
+                    return;
+                }
+
+                if (novaSenha !== confirmarSenha) {
+                    this.mostrarAlerta('Senhas não coincidem!', 'warning');
+                    return;
+                }
+
+                const funcionario = this.funcionarios.find(f => f.cpf === this.funcionarioRecuperar);
+                if (funcionario) {
+                    funcionario.senha = novaSenha;
+                    this.salvarDados();
+                    this.atualizarListaFuncionarios();
+                    this.mostrarAlerta('Senha alterada com sucesso!', 'success');
+                    this.fecharModalRecuperar();
+                }
+            }
+
+            // ========== ATUALIZAÇÕES DE TELA ==========
+            atualizarTodasTelas() {
+                this.atualizarDashboard();
+                this.atualizarListaFuncionarios();
+                this.atualizarTabelaRegistros();
+                this.atualizarTabelaFaltas();
+                this.atualizarTabelaFerias();
+                this.atualizarTabelaLicencas();
+                this.atualizarTabelaFinanceiro();
+                this.atualizarListaUsuarios();
+            }
+
+            atualizarDashboard() {
+                document.getElementById('totalFuncionarios').textContent = 
+                    this.funcionarios.filter(f => f.ativo !== false).length;
+                
+                const comSenha = this.funcionarios.filter(f => f.senha).length;
+                document.getElementById('comSenha').textContent = comSenha;
+                
+                const hoje = new Date().toISOString().split('T')[0];
+                
+                const presentes = this.registros.filter(r => 
+                    r.data === hoje && r.entrada
+                ).length;
+                
+                const faltasHoje = this.faltas.filter(f => f.data === hoje).length;
+                
+                document.getElementById('presentesHoje').textContent = presentes;
+                document.getElementById('faltasHoje').textContent = faltasHoje;
+                
+                const ultimos = [...this.registros]
+                    .sort((a, b) => b.data.localeCompare(a.data))
+                    .slice(0, 5);
+                
+                if (ultimos.length > 0) {
+                    document.getElementById('ultimosRegistros').innerHTML = ultimos.map(r => `
+                        <tr>
+                            <td>${new Date(r.data).toLocaleDateString('pt-BR')}</td>
+                            <td>${r.funcionarioNome}</td>
+                            <td>${r.entrada || '--'}</td>
+                            <td>${r.almoco || '--'}</td>
+                            <td>${r.voltaAlmoco || '--'}</td>
+                            <td>${r.saida || '--'}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    document.getElementById('ultimosRegistros').innerHTML = '<tr><td colspan="6">Nenhum registro</td></tr>';
+                }
+            }
+
+            atualizarListaFuncionarios() {
+                if (this.funcionarios.length === 0) {
+                    document.getElementById('listaFuncionarios').innerHTML = 
+                        '<tr><td colspan="7">Nenhum funcionário</td></tr>';
+                    return;
+                }
+                
+                const tbody = document.getElementById('listaFuncionarios');
+                tbody.innerHTML = this.funcionarios.map(f => {
+                    const cpfFormatado = f.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                    return `
+                        <tr>
+                            <td>${f.matricula || '-'}</td>
+                            <td>${cpfFormatado}</td>
+                            <td>${f.nome}</td>
+                            <td>${f.email || '-'}</td>
+                            <td>
+                                <span class="badge ${f.senha ? 'badge-success' : 'badge-warning'}">
+                                    ${f.senha ? 'Tem' : 'Sem'}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge ${f.ativo !== false ? 'badge-success' : 'badge-danger'}">
+                                    ${f.ativo !== false ? 'Ativo' : 'Inativo'}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-info btn-sm" onclick="abrirModalRecuperar('${f.cpf}', '${f.nome}')">
+                                        🔑 Reset Senha
+                                    </button>
+                                    <button class="btn btn-warning btn-sm" onclick="toggleFuncionarioStatus('${f.cpf}')">
+                                        ${f.ativo !== false ? 'Desativar' : 'Ativar'}
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="confirmarExcluirFuncionario('${f.cpf}', '${f.nome}')">
+                                        Excluir
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            atualizarTabelaRegistros() {
+                const dataInicio = document.getElementById('filtroDataInicio')?.value;
+                const dataFim = document.getElementById('filtroDataFim')?.value;
+                const cpf = document.getElementById('filtroFuncionario')?.value;
+
+                let filtrados = [...this.registros];
+
+                if (dataInicio) filtrados = filtrados.filter(r => r.data >= dataInicio);
+                if (dataFim) filtrados = filtrados.filter(r => r.data <= dataFim);
+                if (cpf) filtrados = filtrados.filter(r => r.funcionarioCpf === cpf);
+
+                filtrados.sort((a, b) => b.data.localeCompare(a.data));
+
+                if (filtrados.length === 0) {
+                    document.getElementById('tabelaRegistros').innerHTML = '<tr><td colspan="8">Nenhum registro</td></tr>';
+                    return;
+                }
+
+                const tbody = document.getElementById('tabelaRegistros');
+                tbody.innerHTML = filtrados.map(r => {
+                    const funcionario = this.funcionarios.find(f => f.cpf === r.funcionarioCpf);
+                    const cpfFormatado = r.funcionarioCpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                    return `
+                        <tr>
+                            <td>${new Date(r.data).toLocaleDateString('pt-BR')}</td>
+                            <td>${funcionario?.matricula || '-'}</td>
+                            <td>${cpfFormatado}</td>
+                            <td>${r.funcionarioNome}</td>
+                            <td>${r.entrada || '--'}</td>
+                            <td>${r.almoco || '--'}</td>
+                            <td>${r.voltaAlmoco || '--'}</td>
+                            <td>${r.saida || '--'}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            atualizarTabelaFaltas() {
+                if (this.faltas.length === 0) {
+                    document.getElementById('tabelaFaltas').innerHTML = 
+                        '<tr><td colspan="4">Nenhuma falta</td></tr>';
+                    return;
+                }
+                
+                const tbody = document.getElementById('tabelaFaltas');
+                tbody.innerHTML = this.faltas.sort((a, b) => b.data.localeCompare(a.data)).map(f => {
+                    const funcionario = this.funcionarios.find(func => func.cpf === f.funcionarioCpf);
+                    return `
+                        <tr>
+                            <td>${new Date(f.data).toLocaleDateString('pt-BR')}</td>
+                            <td>${funcionario?.nome || f.funcionarioCpf}</td>
+                            <td>
+                                <span class="badge ${f.tipo === 'justificada' ? 'badge-success' : 'badge-danger'}">
+                                    ${f.tipo === 'justificada' ? 'Justificada' : 'Não Justificada'}
+                                </span>
+                            </td>
+                            <td>${f.motivo || '--'}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            atualizarTabelaFerias() {
+                if (this.ferias.length === 0) {
+                    document.getElementById('tabelaFerias').innerHTML = 
+                        '<tr><td colspan="5">Nenhum registro</td></tr>';
+                    return;
+                }
+                
+                const tbody = document.getElementById('tabelaFerias');
+                tbody.innerHTML = this.ferias.map(f => {
+                    const funcionario = this.funcionarios.find(func => func.cpf === f.funcionarioCpf);
+                    return `
+                        <tr>
+                            <td>${funcionario?.nome || f.funcionarioCpf}</td>
+                            <td>${f.periodo}</td>
+                            <td>${new Date(f.inicio).toLocaleDateString('pt-BR')}</td>
+                            <td>${new Date(f.fim).toLocaleDateString('pt-BR')}</td>
+                            <td>${f.dias}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            atualizarTabelaLicencas() {
+                if (this.licencas.length === 0) {
+                    document.getElementById('tabelaLicencas').innerHTML = 
+                        '<tr><td colspan="5">Nenhum registro</td></tr>';
+                    return;
+                }
+                
+                const tbody = document.getElementById('tabelaLicencas');
+                tbody.innerHTML = this.licencas.map(l => {
+                    const funcionario = this.funcionarios.find(func => func.cpf === l.funcionarioCpf);
+                    return `
+                        <tr>
+                            <td>${funcionario?.nome || l.funcionarioCpf}</td>
+                            <td>${l.tipo}</td>
+                            <td>${new Date(l.inicio).toLocaleDateString('pt-BR')} - ${new Date(l.fim).toLocaleDateString('pt-BR')}</td>
+                            <td>${l.dias}</td>
+                            <td>${l.motivo || '--'}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            atualizarTabelaFinanceiro() {
+                if (this.funcionarios.length === 0) {
+                    document.getElementById('tabelaFinanceiro').innerHTML = 
+                        '<tr><td colspan="7">Sem dados</td></tr>';
+                    return;
+                }
+                
+                const tbody = document.getElementById('tabelaFinanceiro');
+                const linhas = this.funcionarios.filter(f => f.ativo !== false).map(func => {
+                    const registrosFunc = this.registros.filter(r => r.funcionarioCpf === func.cpf);
+                    const faltasFunc = this.faltas.filter(f => f.funcionarioCpf === func.cpf && f.tipo === 'nao_justificada');
+                    
+                    const diasTrab = registrosFunc.filter(r => r.entrada).length;
+                    const totalFaltas = faltasFunc.length;
+                    
+                    let totalExtras = 0;
+                    registrosFunc.forEach(r => {
+                        if (r.saida) {
+                            const [h, m] = r.saida.split(':').map(Number);
+                            const saidaMin = h * 60 + m;
+                            const previstaMin = 17 * 60 + 45;
+                            if (saidaMin > previstaMin) {
+                                totalExtras += saidaMin - previstaMin;
+                            }
+                        }
+                    });
+                    
+                    const valorExtras = (totalExtras / 60) * 20;
+                    const descontos = totalFaltas * 80;
+                    
+                    return `
+                        <tr>
+                            <td>${func.nome}</td>
+                            <td>${diasTrab}</td>
+                            <td>${totalFaltas}</td>
+                            <td>${Math.floor(totalExtras / 60)}h ${totalExtras % 60}min</td>
+                            <td>R$ ${valorExtras.toFixed(2)}</td>
+                            <td>R$ ${descontos.toFixed(2)}</td>
+                            <td>R$ ${(valorExtras - descontos).toFixed(2)}</td>
+                        </tr>
+                    `;
+                }).join('');
+                
+                tbody.innerHTML = linhas || '<tr><td colspan="7">Sem dados</td></tr>';
+            }
+
+            atualizarListaUsuarios() {
+                if (this.usuarios.length === 0) {
+                    document.getElementById('listaUsuarios').innerHTML = 
+                        '<tr><td colspan="3">Nenhum admin</td></tr>';
+                    return;
+                }
+                
+                const tbody = document.getElementById('listaUsuarios');
+                tbody.innerHTML = this.usuarios.map(u => `
+                    <tr>
+                        <td>${u.username}</td>
+                        <td>${u.nome}</td>
+                        <td>
+                            ${u.id !== this.usuarioAtual?.id ? `
+                                <button class="btn btn-danger btn-sm" onclick="deletarUsuario(${u.id})">Deletar</button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // ========== EXPORTAÇÕES ==========
+            exportarCSV() {
+                if (this.registros.length === 0) {
+                    this.mostrarAlerta('Nenhum registro!', 'warning');
+                    return;
+                }
+                
+                const linhas = [['Data', 'Matrícula', 'CPF', 'Nome', 'Entrada', 'Almoço', 'Volta', 'Saída']];
+                
+                this.registros.forEach(r => {
+                    const funcionario = this.funcionarios.find(f => f.cpf === r.funcionarioCpf);
+                    linhas.push([
+                        r.data,
+                        funcionario?.matricula || '',
+                        r.funcionarioCpf,
+                        r.funcionarioNome,
+                        r.entrada || '',
+                        r.almoco || '',
+                        r.voltaAlmoco || '',
+                        r.saida || ''
+                    ]);
+                });
+
+                const csv = linhas.map(l => l.join(',')).join('\n');
+                const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `relatorio_${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+                this.mostrarAlerta('CSV exportado!', 'success');
+            }
+
+            // ========== REGISTROS ==========
+            registrarFalta() {
+                const dados = {
+                    funcionarioCpf: document.getElementById('faltaFuncionario').value,
+                    data: document.getElementById('faltaData').value,
+                    tipo: document.getElementById('faltaTipo').value,
+                    motivo: document.getElementById('faltaMotivo').value
+                };
+                
+                if (!dados.funcionarioCpf || !dados.data) {
+                    this.mostrarAlerta('Preencha os campos!', 'warning');
+                    return;
+                }
+                
+                this.faltas.push({ id: Date.now(), ...dados });
+                this.salvarDados();
+                this.atualizarTabelaFaltas();
+                this.atualizarDashboard();
+                this.mostrarAlerta('Falta registrada!', 'success');
+                
+                document.getElementById('faltaMotivo').value = '';
+            }
+
+            cadastrarFerias() {
+                const dados = {
+                    funcionarioCpf: document.getElementById('feriasFuncionario').value,
+                    periodo: document.getElementById('feriasPeriodo').value,
+                    inicio: document.getElementById('feriasInicio').value,
+                    fim: document.getElementById('feriasFim').value,
+                    dias: document.getElementById('feriasDias').value
+                };
+                
+                if (!dados.funcionarioCpf || !dados.inicio || !dados.fim) {
+                    this.mostrarAlerta('Preencha os campos!', 'warning');
+                    return;
+                }
+                
+                this.ferias.push({ id: Date.now(), ...dados });
+                this.salvarDados();
+                this.atualizarTabelaFerias();
+                this.mostrarAlerta('Férias cadastradas!', 'success');
+            }
+
+            registrarLicenca() {
+                const dados = {
+                    funcionarioCpf: document.getElementById('licencaFuncionario').value,
+                    tipo: document.getElementById('licencaTipo').value,
+                    inicio: document.getElementById('licencaInicio').value,
+                    fim: document.getElementById('licencaFim').value,
+                    dias: document.getElementById('licencaDias').value,
+                    motivo: document.getElementById('licencaMotivo').value
+                };
+                
+                if (!dados.funcionarioCpf || !dados.inicio || !dados.fim) {
+                    this.mostrarAlerta('Preencha os campos!', 'warning');
+                    return;
+                }
+                
+                this.licencas.push({ id: Date.now(), ...dados });
+                this.salvarDados();
+                this.atualizarTabelaLicencas();
+                this.mostrarAlerta('Licença registrada!', 'success');
+            }
+
+            criarUsuario() {
+                if (this.usuarioAtual?.id !== 1) {
+                    this.mostrarAlerta('Só o admin principal pode criar!', 'warning');
+                    return;
+                }
+                
+                const dados = {
+                    username: document.getElementById('novoUsuarioUser').value,
+                    password: document.getElementById('novoUsuarioSenha').value,
+                    nome: document.getElementById('novoUsuarioNome').value
+                };
+                
+                if (!dados.username || !dados.password || !dados.nome) {
+                    this.mostrarAlerta('Preencha tudo!', 'warning');
+                    return;
+                }
+                
+                const novo = { id: this.usuarios.length + 1, ...dados };
+                this.usuarios.push(novo);
+                this.salvarDados();
+                this.atualizarListaUsuarios();
+                this.mostrarAlerta('Admin criado!', 'success');
+                
+                document.getElementById('novoUsuarioUser').value = '';
+                document.getElementById('novoUsuarioSenha').value = '';
+                document.getElementById('novoUsuarioNome').value = '';
+            }
+
+            deletarUsuario(id) {
+                if (id === 1) {
+                    this.mostrarAlerta('Não pode deletar admin principal!', 'warning');
+                    return;
+                }
+                this.usuarios = this.usuarios.filter(u => u.id !== id);
+                this.salvarDados();
+                this.atualizarListaUsuarios();
+            }
+
+            gerarFolhaPagamento() {
+                this.mostrarAlerta('Folha gerada!', 'success');
+            }
+
+            filtrarRegistros() {
+                this.atualizarTabelaRegistros();
+            }
+        }
+
+        const sistema = new SistemaCompleto();
+
+        // ========== FUNÇÕES GLOBAIS ==========
+        window.mudarTabLogin = (tab) => {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+        };
+
+        window.mudarTabSistema = (tab) => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.main-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(`sistema-${tab}`).classList.add('active');
+        };
+
+        window.fazerLogin = (e) => {
+            e.preventDefault();
+            const u = document.getElementById('loginUsername').value;
+            const p = document.getElementById('loginPassword').value;
+            sistema.fazerLogin(u, p);
+        };
+
+        window.criarPrimeiroAcesso = (e) => {
+            e.preventDefault();
+            sistema.criarPrimeiroAcesso({
+                nome: document.getElementById('primeiroNome').value,
+                username: document.getElementById('primeiroUsuario').value,
+                password: document.getElementById('primeiroSenha').value,
+                confirmPassword: document.getElementById('primeiroConfirmarSenha').value
+            });
+        };
+
+        window.logout = () => sistema.logout();
+        window.cadastrarFuncionario = () => sistema.cadastrarFuncionario();
+        window.toggleFuncionarioStatus = (cpf) => sistema.toggleFuncionarioStatus(cpf);
+        window.filtrarRegistros = () => sistema.filtrarRegistros();
+        window.exportarCSV = () => sistema.exportarCSV();
+        window.registrarFalta = () => sistema.registrarFalta();
+        window.cadastrarFerias = () => sistema.cadastrarFerias();
+        window.registrarLicenca = () => sistema.registrarLicenca();
+        window.criarUsuario = () => sistema.criarUsuario();
+        window.gerarFolhaPagamento = () => sistema.gerarFolhaPagamento();
+
+        window.confirmarExcluirFuncionario = (cpf, nome) => {
+            sistema.funcionarioParaExcluir = cpf;
+            document.getElementById('modalMensagem').textContent = `Excluir ${nome}?`;
+            document.getElementById('modalExcluir').style.display = 'block';
+        };
+
+        window.fecharModal = () => {
+            document.getElementById('modalExcluir').style.display = 'none';
+            sistema.funcionarioParaExcluir = null;
+        };
+
+        window.abrirModalRecuperar = (cpf, nome) => {
+            sistema.abrirModalRecuperar(cpf, nome);
+        };
+
+        window.fecharModalRecuperar = () => {
+            sistema.fecharModalRecuperar();
+        };
+
+        document.getElementById('confirmarExcluir').onclick = () => {
+            if (sistema.funcionarioParaExcluir) {
+                sistema.excluirFuncionario(sistema.funcionarioParaExcluir);
+                fecharModal();
+            }
+        };
+
+        document.getElementById('confirmarRecuperar').onclick = () => {
+            sistema.salvarNovaSenha();
+        };
+
+        window.deletarUsuario = (id) => {
+            if (confirm('Deletar admin?')) {
+                sistema.deletarUsuario(id);
+            }
+        };
+
+        window.onclick = (e) => {
+            const modal = document.getElementById('modalExcluir');
+            const modalRec = document.getElementById('modalRecuperarSenha');
+            if (e.target === modal) fecharModal();
+            if (e.target === modalRec) fecharModalRecuperar();
+        };
+    </script>
+</body>
+</html>
