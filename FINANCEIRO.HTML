@@ -397,6 +397,103 @@
             font-size: 12px;
         }
 
+        /* Área de upload */
+        .upload-area {
+            border: 2px dashed #1e3c72;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .upload-area:hover {
+            background: #e9ecef;
+            border-color: #28a745;
+        }
+
+        .upload-area.dragover {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #1e3c72;
+            margin-bottom: 10px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-list {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .file-size {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .file-remove {
+            color: #dc3545;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .file-remove:hover {
+            color: #c82333;
+        }
+
+        .file-preview {
+            max-width: 50px;
+            max-height: 50px;
+            border-radius: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 5px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #28a745;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
         .alert {
             padding: 15px;
             border-radius: 8px;
@@ -474,12 +571,9 @@
     <script>
         // ===== AUTENTICAÇÃO OFUSCADA DO CARTÓRIO =====
         (function() {
-            // Senha ofuscada: Registroponto51374@
-            // Convertida para códigos charCode para não aparecer diretamente
             const senhaOfuscada = [82, 101, 103, 105, 115, 116, 114, 111, 112, 111, 110, 116, 111, 53, 49, 51, 55, 52, 64];
             const senhaCorreta = senhaOfuscada.map(c => String.fromCharCode(c)).join('');
             
-            // Verifica se já está autenticado nesta sessão
             if (!sessionStorage.getItem('acessoCartorio')) {
                 const senhaDigitada = prompt("🔐 ACESSO RESTRITO AO CARTÓRIO\nDigite a senha de acesso:");
                 
@@ -497,8 +591,6 @@
                     `;
                     throw new Error("Acesso negado");
                 }
-                
-                // Marca como autenticado para a sessão
                 sessionStorage.setItem('acessoCartorio', 'true');
             }
         })();
@@ -676,7 +768,7 @@
                 </div>
             </div>
 
-            <!-- FUNCIONÁRIOS - COM MATRÍCULA E EMAIL -->
+            <!-- FUNCIONÁRIOS -->
             <div id="sistema-funcionarios" class="main-content">
                 <div class="card">
                     <h2>👥 Cadastro de Funcionários</h2>
@@ -749,6 +841,7 @@
                         <div style="display: flex; align-items: flex-end; gap: 10px;">
                             <button class="btn btn-primary" onclick="filtrarRegistros()">Filtrar</button>
                             <button class="btn btn-success" onclick="exportarCSV()">📥 CSV</button>
+                            <button class="btn btn-info" onclick="gerarPDF()">📄 PDF</button>
                         </div>
                     </div>
 
@@ -764,17 +857,19 @@
                                     <th>Almoço</th>
                                     <th>Volta</th>
                                     <th>Saída</th>
+                                    <th>Horas</th>
+                                    <th>Extras</th>
                                 </tr>
                             </thead>
                             <tbody id="tabelaRegistros">
-                                <tr><td colspan="8" style="text-align: center;">Nenhum registro</td></tr>
+                                <tr><td colspan="10" style="text-align: center;">Nenhum registro</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- FALTAS -->
+            <!-- FALTAS - COM UPLOAD DE DOCUMENTOS -->
             <div id="sistema-faltas" class="main-content">
                 <div class="card">
                     <h2>❌ Controle de Faltas</h2>
@@ -794,7 +889,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Tipo:</label>
-                                <select id="faltaTipo" class="form-control">
+                                <select id="faltaTipo" class="form-control" onchange="toggleJustificativa()">
                                     <option value="nao_justificada">Não Justificada</option>
                                     <option value="justificada">Justificada</option>
                                 </select>
@@ -804,6 +899,57 @@
                                 <input type="text" id="faltaMotivo" class="form-control" placeholder="Motivo da falta">
                             </div>
                         </div>
+
+                        <!-- Área de Upload (aparece apenas quando seleciona Justificada) -->
+                        <div id="areaJustificativa" style="display: none; margin-top: 20px; padding: 20px; background: white; border-radius: 10px; border: 2px dashed #667eea;">
+                            <h4 style="margin-bottom: 15px; color: #333;">📎 Documentos de Justificativa</h4>
+                            
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label>Tipo de Documento:</label>
+                                    <select id="documentoTipo" class="form-control">
+                                        <option value="atestado">Atestado Médico</option>
+                                        <option value="declaracao">Declaração</option>
+                                        <option value="cid">Atestado com CID</option>
+                                        <option value="outros">Outros</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Número do Documento:</label>
+                                    <input type="text" id="documentoNumero" class="form-control" placeholder="Número do documento">
+                                </div>
+                            </div>
+
+                            <!-- Área de Upload com Preview -->
+                            <div style="margin: 20px 0;">
+                                <label style="display: block; margin-bottom: 10px; font-weight: 600;">Anexar documentos (PDF, JPG, PNG):</label>
+                                
+                                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                    <button type="button" class="btn btn-info" onclick="document.getElementById('fileInput').click()" style="margin: 0;">
+                                        📎 Selecionar Arquivos
+                                    </button>
+                                    <span style="color: #666; font-size: 14px;" id="arquivoSelecionado">Nenhum arquivo selecionado</span>
+                                </div>
+                                
+                                <input type="file" id="fileInput" class="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onchange="handleFileSelect(event)" style="display: none;">
+                                
+                                <!-- Barra de progresso -->
+                                <div class="progress-bar" id="progressBar" style="display: none; margin-top: 15px;">
+                                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                                </div>
+                                
+                                <!-- Lista de arquivos selecionados -->
+                                <div id="fileList" style="margin-top: 15px; max-height: 200px; overflow-y: auto;"></div>
+                                
+                                <!-- Prévia de imagens -->
+                                <div id="imagePreview" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;"></div>
+                            </div>
+
+                            <div class="info-box" style="margin-top: 10px;">
+                                <strong>ℹ️ Formatos aceitos:</strong> PDF, JPG, PNG, DOC (máx 10MB por arquivo)
+                            </div>
+                        </div>
+
                         <button class="btn btn-primary" style="margin-top: 20px;" onclick="registrarFalta()">Registrar Falta</button>
                     </div>
 
@@ -816,10 +962,12 @@
                                     <th>Funcionário</th>
                                     <th>Tipo</th>
                                     <th>Motivo</th>
+                                    <th>Documentos</th>
+                                    <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="tabelaFaltas">
-                                <tr><td colspan="4" style="text-align: center;">Nenhuma falta</td></tr>
+                                <tr><td colspan="6" style="text-align: center;">Nenhuma falta registrada</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1063,7 +1211,18 @@
             </div>
         </div>
 
-        <div class="footer">Sistema Administrativo v6.0 - Acesso Restrito</div>
+        <!-- Modal para visualizar documentos -->
+        <div id="modalVisualizarDocs" class="modal">
+            <div class="modal-content" style="max-width: 600px;">
+                <h3>📄 Documentos Anexados</h3>
+                <div id="documentosContainer" style="max-height: 400px; overflow-y: auto; margin: 20px 0;"></div>
+                <div class="modal-buttons">
+                    <button class="btn btn-primary" onclick="fecharModalDocs()">Fechar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Sistema Administrativo v7.0 - Completo</div>
     </div>
 
     <script>
@@ -1076,7 +1235,7 @@
             return true;
         };
 
-        // ========== VALIDAÇÃO DE CPF (ALGORITMO OFICIAL DA RECEITA FEDERAL) ==========
+        // ========== VALIDAÇÃO DE CPF ==========
         function validarCPF(cpf) {
             cpf = cpf.replace(/\D/g, '');
             if (cpf.length !== 11) return false;
@@ -1102,6 +1261,133 @@
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return re.test(email);
         }
+
+        // ========== VARIÁVEIS GLOBAIS PARA UPLOAD ==========
+        let arquivosSelecionados = [];
+
+        // ========== FUNÇÕES DE UPLOAD ==========
+        window.toggleJustificativa = () => {
+            const tipo = document.getElementById('faltaTipo').value;
+            document.getElementById('areaJustificativa').style.display = tipo === 'justificada' ? 'block' : 'none';
+        };
+
+        window.handleFileSelect = (event) => {
+            const files = event.target.files;
+            arquivosSelecionados = Array.from(files);
+            
+            const fileList = document.getElementById('fileList');
+            const imagePreview = document.getElementById('imagePreview');
+            const arquivoSelecionado = document.getElementById('arquivoSelecionado');
+            
+            fileList.innerHTML = '';
+            imagePreview.innerHTML = '';
+            
+            if (arquivosSelecionados.length === 0) {
+                arquivoSelecionado.textContent = 'Nenhum arquivo selecionado';
+                return;
+            }
+            
+            arquivoSelecionado.textContent = `${arquivosSelecionados.length} arquivo(s) selecionado(s)`;
+            
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            progressBar.style.display = 'block';
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressFill.style.width = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    
+                    arquivosSelecionados.forEach((file, index) => {
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'file-item';
+                        
+                        const fileInfo = document.createElement('div');
+                        fileInfo.className = 'file-info';
+                        
+                        if (file.type.startsWith('image/')) {
+                            fileInfo.innerHTML = `🖼️ ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                        } else if (file.type === 'application/pdf') {
+                            fileInfo.innerHTML = `📄 ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                        } else {
+                            fileInfo.innerHTML = `📎 ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                        }
+                        
+                        const removeBtn = document.createElement('span');
+                        removeBtn.className = 'file-remove';
+                        removeBtn.innerHTML = '❌';
+                        removeBtn.onclick = () => {
+                            arquivosSelecionados.splice(index, 1);
+                            fileItem.remove();
+                            if (arquivosSelecionados.length === 0) {
+                                arquivoSelecionado.textContent = 'Nenhum arquivo selecionado';
+                                progressBar.style.display = 'none';
+                            }
+                        };
+                        
+                        fileItem.appendChild(fileInfo);
+                        fileItem.appendChild(removeBtn);
+                        fileList.appendChild(fileItem);
+                        
+                        if (file.type.startsWith('image/')) {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const img = document.createElement('img');
+                                img.src = e.target.result;
+                                img.style.width = '100px';
+                                img.style.height = '100px';
+                                img.style.objectFit = 'cover';
+                                img.style.borderRadius = '5px';
+                                img.style.border = '2px solid #667eea';
+                                imagePreview.appendChild(img);
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                }
+            }, 100);
+        };
+
+        window.fecharModalDocs = () => {
+            document.getElementById('modalVisualizarDocs').style.display = 'none';
+        };
+
+        window.visualizarDocumentos = (faltaId) => {
+            const falta = sistema.faltas.find(f => f.id === faltaId);
+            if (!falta || !falta.documentos || falta.documentos.length === 0) return;
+            
+            const container = document.getElementById('documentosContainer');
+            container.innerHTML = '';
+            
+            falta.documentos.forEach(doc => {
+                const div = document.createElement('div');
+                div.style.margin = '10px 0';
+                div.style.padding = '10px';
+                div.style.background = '#f8f9fa';
+                div.style.borderRadius = '5px';
+                
+                if (doc.tipo?.startsWith('image/')) {
+                    div.innerHTML = `
+                        <p><strong>${doc.nome}</strong></p>
+                        <img src="${doc.dataUrl}" style="max-width: 100%; max-height: 200px; border-radius: 5px;">
+                        <p style="font-size: 12px; color: #666;">${(doc.tamanho / 1024).toFixed(2)} KB</p>
+                    `;
+                } else {
+                    div.innerHTML = `
+                        <p><strong>${doc.nome}</strong></p>
+                        <a href="${doc.dataUrl}" target="_blank" class="btn btn-sm btn-info">Abrir Documento</a>
+                        <p style="font-size: 12px; color: #666;">${(doc.tamanho / 1024).toFixed(2)} KB</p>
+                    `;
+                }
+                
+                container.appendChild(div);
+            });
+            
+            document.getElementById('modalVisualizarDocs').style.display = 'block';
+        };
 
         // ==================== SISTEMA COMPLETO ====================
         class SistemaCompleto {
@@ -1488,7 +1774,7 @@
                 filtrados.sort((a, b) => b.data.localeCompare(a.data));
 
                 if (filtrados.length === 0) {
-                    document.getElementById('tabelaRegistros').innerHTML = '<tr><td colspan="8">Nenhum registro</td></tr>';
+                    document.getElementById('tabelaRegistros').innerHTML = '<tr><td colspan="10">Nenhum registro</td></tr>';
                     return;
                 }
 
@@ -1496,6 +1782,38 @@
                 tbody.innerHTML = filtrados.map(r => {
                     const funcionario = this.funcionarios.find(f => f.cpf === r.funcionarioCpf);
                     const cpfFormatado = r.funcionarioCpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                    
+                    // Calcular horas
+                    let horasTrab = '';
+                    let horasExtras = '';
+                    
+                    if (r.entrada && r.saida) {
+                        const entrada = r.entrada.split(':').map(Number);
+                        const saida = r.saida.split(':').map(Number);
+                        
+                        let minutosTrab = (saida[0] * 60 + saida[1]) - (entrada[0] * 60 + entrada[1]);
+                        
+                        if (r.almoco && r.voltaAlmoco) {
+                            const almoco = r.almoco.split(':').map(Number);
+                            const volta = r.voltaAlmoco.split(':').map(Number);
+                            const minutosAlmoco = (volta[0] * 60 + volta[1]) - (almoco[0] * 60 + almoco[1]);
+                            minutosTrab -= minutosAlmoco;
+                        }
+                        
+                        const horas = Math.floor(minutosTrab / 60);
+                        const minutos = minutosTrab % 60;
+                        horasTrab = `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}`;
+                        
+                        const saidaMin = saida[0] * 60 + saida[1];
+                        const limiteMin = 17 * 60 + 45;
+                        if (saidaMin > limiteMin) {
+                            const extrasMin = saidaMin - limiteMin;
+                            const horasExt = Math.floor(extrasMin / 60);
+                            const minExt = extrasMin % 60;
+                            horasExtras = `${horasExt.toString().padStart(2, '0')}:${minExt.toString().padStart(2, '0')}`;
+                        }
+                    }
+                    
                     return `
                         <tr>
                             <td>${new Date(r.data).toLocaleDateString('pt-BR')}</td>
@@ -1506,6 +1824,8 @@
                             <td>${r.almoco || '--'}</td>
                             <td>${r.voltaAlmoco || '--'}</td>
                             <td>${r.saida || '--'}</td>
+                            <td>${horasTrab}</td>
+                            <td>${horasExtras}</td>
                         </tr>
                     `;
                 }).join('');
@@ -1514,13 +1834,15 @@
             atualizarTabelaFaltas() {
                 if (this.faltas.length === 0) {
                     document.getElementById('tabelaFaltas').innerHTML = 
-                        '<tr><td colspan="4">Nenhuma falta</td></tr>';
+                        '<tr><td colspan="6" style="text-align: center;">Nenhuma falta registrada</td></tr>';
                     return;
                 }
                 
                 const tbody = document.getElementById('tabelaFaltas');
                 tbody.innerHTML = this.faltas.sort((a, b) => b.data.localeCompare(a.data)).map(f => {
                     const funcionario = this.funcionarios.find(func => func.cpf === f.funcionarioCpf);
+                    const numDocs = f.documentos?.length || 0;
+                    
                     return `
                         <tr>
                             <td>${new Date(f.data).toLocaleDateString('pt-BR')}</td>
@@ -1531,6 +1853,18 @@
                                 </span>
                             </td>
                             <td>${f.motivo || '--'}</td>
+                            <td>
+                                ${numDocs > 0 ? 
+                                    `<span class="badge badge-info">${numDocs} arquivo(s)</span>` : 
+                                    '<span class="badge badge-warning">Sem documentos</span>'
+                                }
+                            </td>
+                            <td>
+                                ${numDocs > 0 ? 
+                                    `<button class="btn btn-info btn-sm" onclick="visualizarDocumentos(${f.id})">📎 Ver Docs</button>` : 
+                                    '--'
+                                }
+                            </td>
                         </tr>
                     `;
                 }).join('');
@@ -1539,7 +1873,7 @@
             atualizarTabelaFerias() {
                 if (this.ferias.length === 0) {
                     document.getElementById('tabelaFerias').innerHTML = 
-                        '<tr><td colspan="5">Nenhum registro</td></tr>';
+                        '<tr><td colspan="5" style="text-align: center;">Nenhum registro</td></tr>';
                     return;
                 }
                 
@@ -1561,7 +1895,7 @@
             atualizarTabelaLicencas() {
                 if (this.licencas.length === 0) {
                     document.getElementById('tabelaLicencas').innerHTML = 
-                        '<tr><td colspan="5">Nenhum registro</td></tr>';
+                        '<tr><td colspan="5" style="text-align: center;">Nenhum registro</td></tr>';
                     return;
                 }
                 
@@ -1583,7 +1917,7 @@
             atualizarTabelaFinanceiro() {
                 if (this.funcionarios.length === 0) {
                     document.getElementById('tabelaFinanceiro').innerHTML = 
-                        '<tr><td colspan="7">Sem dados</td></tr>';
+                        '<tr><td colspan="7" style="text-align: center;">Sem dados</td></tr>';
                     return;
                 }
                 
@@ -1629,7 +1963,7 @@
             atualizarListaUsuarios() {
                 if (this.usuarios.length === 0) {
                     document.getElementById('listaUsuarios').innerHTML = 
-                        '<tr><td colspan="3">Nenhum admin</td></tr>';
+                        '<tr><td colspan="3" style="text-align: center;">Nenhum admin</td></tr>';
                     return;
                 }
                 
@@ -1650,33 +1984,309 @@
             // ========== EXPORTAÇÕES ==========
             exportarCSV() {
                 if (this.registros.length === 0) {
-                    this.mostrarAlerta('Nenhum registro!', 'warning');
+                    this.mostrarAlerta('Nenhum registro para exportar!', 'warning');
                     return;
                 }
+
+                const linhas = [];
                 
-                const linhas = [['Data', 'Matrícula', 'CPF', 'Nome', 'Entrada', 'Almoço', 'Volta', 'Saída']];
-                
-                this.registros.forEach(r => {
+                linhas.push([
+                    'DATA',
+                    'MATRÍCULA',
+                    'CPF',
+                    'NOME DO FUNCIONÁRIO',
+                    'ENTRADA',
+                    'SAÍDA ALMOÇO',
+                    'VOLTA ALMOÇO',
+                    'SAÍDA',
+                    'HORAS TRABALHADAS',
+                    'HORAS EXTRAS',
+                    'STATUS'
+                ]);
+
+                this.registros.sort((a, b) => b.data.localeCompare(a.data)).forEach(r => {
                     const funcionario = this.funcionarios.find(f => f.cpf === r.funcionarioCpf);
+                    const cpfFormatado = r.funcionarioCpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                    
+                    let horasTrab = '';
+                    let horasExtras = '';
+                    
+                    if (r.entrada && r.saida) {
+                        const entrada = r.entrada.split(':').map(Number);
+                        const saida = r.saida.split(':').map(Number);
+                        
+                        let minutosTrab = (saida[0] * 60 + saida[1]) - (entrada[0] * 60 + entrada[1]);
+                        
+                        if (r.almoco && r.voltaAlmoco) {
+                            const almoco = r.almoco.split(':').map(Number);
+                            const volta = r.voltaAlmoco.split(':').map(Number);
+                            const minutosAlmoco = (volta[0] * 60 + volta[1]) - (almoco[0] * 60 + almoco[1]);
+                            minutosTrab -= minutosAlmoco;
+                        }
+                        
+                        const horas = Math.floor(minutosTrab / 60);
+                        const minutos = minutosTrab % 60;
+                        horasTrab = `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}`;
+                        
+                        const saidaMin = saida[0] * 60 + saida[1];
+                        const limiteMin = 17 * 60 + 45;
+                        if (saidaMin > limiteMin) {
+                            const extrasMin = saidaMin - limiteMin;
+                            const horasExt = Math.floor(extrasMin / 60);
+                            const minExt = extrasMin % 60;
+                            horasExtras = `${horasExt.toString().padStart(2, '0')}:${minExt.toString().padStart(2, '0')}`;
+                        }
+                    }
+                    
                     linhas.push([
-                        r.data,
+                        new Date(r.data).toLocaleDateString('pt-BR'),
                         funcionario?.matricula || '',
-                        r.funcionarioCpf,
+                        cpfFormatado,
                         r.funcionarioNome,
                         r.entrada || '',
                         r.almoco || '',
                         r.voltaAlmoco || '',
-                        r.saida || ''
+                        r.saida || '',
+                        horasTrab,
+                        horasExtras,
+                        r.entrada ? 'PRESENTE' : 'AUSENTE'
                     ]);
                 });
 
-                const csv = linhas.map(l => l.join(',')).join('\n');
-                const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+                const csvContent = linhas.map(linha => 
+                    linha.map(campo => {
+                        if (campo === null || campo === undefined) return '';
+                        const str = String(campo);
+                        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                            return `"${str.replace(/"/g, '""')}"`;
+                        }
+                        return str;
+                    }).join(';')
+                ).join('\n');
+
+                const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = `relatorio_${new Date().toISOString().split('T')[0]}.csv`;
+                link.download = `relatorio_ponto_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`;
                 link.click();
-                this.mostrarAlerta('CSV exportado!', 'success');
+                
+                this.mostrarAlerta('CSV exportado com sucesso!', 'success');
+            }
+
+            gerarPDF() {
+                if (this.registros.length === 0) {
+                    this.mostrarAlerta('Nenhum registro para gerar PDF!', 'warning');
+                    return;
+                }
+
+                const dataInicio = document.getElementById('filtroDataInicio')?.value;
+                const dataFim = document.getElementById('filtroDataFim')?.value;
+                const cpf = document.getElementById('filtroFuncionario')?.value;
+
+                let filtrados = [...this.registros];
+                if (dataInicio) filtrados = filtrados.filter(r => r.data >= dataInicio);
+                if (dataFim) filtrados = filtrados.filter(r => r.data <= dataFim);
+                if (cpf) filtrados = filtrados.filter(r => r.funcionarioCpf === cpf);
+                
+                filtrados.sort((a, b) => b.data.localeCompare(a.data));
+
+                let html = `
+                    <!DOCTYPE html>
+                    <html lang="pt-BR">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Relatório de Ponto</title>
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                                margin: 20px;
+                                font-size: 12px;
+                            }
+                            .header {
+                                text-align: center;
+                                margin-bottom: 30px;
+                                padding: 20px;
+                                background: #1e3c72;
+                                color: white;
+                            }
+                            .header h1 {
+                                margin: 0;
+                                font-size: 24px;
+                            }
+                            .header p {
+                                margin: 5px 0 0;
+                                opacity: 0.9;
+                            }
+                            .info-periodo {
+                                background: #f0f0f0;
+                                padding: 10px;
+                                margin-bottom: 20px;
+                                border-left: 4px solid #1e3c72;
+                            }
+                            table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-top: 20px;
+                            }
+                            th {
+                                background: #1e3c72;
+                                color: white;
+                                padding: 8px;
+                                text-align: left;
+                                font-size: 11px;
+                            }
+                            td {
+                                padding: 6px;
+                                border: 1px solid #ddd;
+                            }
+                            tr:nth-child(even) {
+                                background: #f9f9f9;
+                            }
+                            .footer {
+                                margin-top: 30px;
+                                text-align: center;
+                                color: #666;
+                                font-size: 10px;
+                            }
+                            .assinatura {
+                                margin-top: 50px;
+                                display: flex;
+                                justify-content: space-between;
+                            }
+                            .linha-assinatura {
+                                width: 200px;
+                                border-top: 1px solid #000;
+                                margin-top: 30px;
+                                text-align: center;
+                                padding-top: 5px;
+                            }
+                            @media print {
+                                body { margin: 0; }
+                                .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                                th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <h1>Oficial de Registro Civil</h1>
+                            <p>Mogi das Cruzes - CNPJ: 51.374.270/0001-01</p>
+                        </div>
+                        
+                        <div class="info-periodo">
+                            <strong>Período:</strong> ${dataInicio ? new Date(dataInicio).toLocaleDateString('pt-BR') : 'Início'} até ${dataFim ? new Date(dataFim).toLocaleDateString('pt-BR') : 'Hoje'}
+                            <br>
+                            <strong>Total de registros:</strong> ${filtrados.length}
+                        </div>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Matr.</th>
+                                    <th>Nome</th>
+                                    <th>Entrada</th>
+                                    <th>Almoço</th>
+                                    <th>Volta</th>
+                                    <th>Saída</th>
+                                    <th>Horas</th>
+                                    <th>Extras</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                let totalHoras = 0;
+                let totalExtras = 0;
+
+                filtrados.forEach(r => {
+                    const funcionario = this.funcionarios.find(f => f.cpf === r.funcionarioCpf);
+                    
+                    let horasTrab = '';
+                    let horasExtras = '';
+                    let minutosTrab = 0;
+                    let minutosExtras = 0;
+                    
+                    if (r.entrada && r.saida) {
+                        const entrada = r.entrada.split(':').map(Number);
+                        const saida = r.saida.split(':').map(Number);
+                        
+                        minutosTrab = (saida[0] * 60 + saida[1]) - (entrada[0] * 60 + entrada[1]);
+                        
+                        if (r.almoco && r.voltaAlmoco) {
+                            const almoco = r.almoco.split(':').map(Number);
+                            const volta = r.voltaAlmoco.split(':').map(Number);
+                            const minutosAlmoco = (volta[0] * 60 + volta[1]) - (almoco[0] * 60 + almoco[1]);
+                            minutosTrab -= minutosAlmoco;
+                        }
+                        
+                        totalHoras += minutosTrab;
+                        
+                        const horas = Math.floor(minutosTrab / 60);
+                        const minutos = minutosTrab % 60;
+                        horasTrab = `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}`;
+                        
+                        const saidaMin = saida[0] * 60 + saida[1];
+                        const limiteMin = 17 * 60 + 45;
+                        if (saidaMin > limiteMin) {
+                            minutosExtras = saidaMin - limiteMin;
+                            totalExtras += minutosExtras;
+                            const horasExt = Math.floor(minutosExtras / 60);
+                            const minExt = minutosExtras % 60;
+                            horasExtras = `${horasExt.toString().padStart(2, '0')}:${minExt.toString().padStart(2, '0')}`;
+                        }
+                    }
+                    
+                    html += `
+                        <tr>
+                            <td>${new Date(r.data).toLocaleDateString('pt-BR')}</td>
+                            <td>${funcionario?.matricula || ''}</td>
+                            <td>${r.funcionarioNome}</td>
+                            <td>${r.entrada || ''}</td>
+                            <td>${r.almoco || ''}</td>
+                            <td>${r.voltaAlmoco || ''}</td>
+                            <td>${r.saida || ''}</td>
+                            <td>${horasTrab}</td>
+                            <td>${horasExtras}</td>
+                        </tr>
+                    `;
+                });
+
+                const totalHorasFormat = Math.floor(totalHoras / 60) + 'h ' + (totalHoras % 60) + 'min';
+                const totalExtrasFormat = Math.floor(totalExtras / 60) + 'h ' + (totalExtras % 60) + 'min';
+
+                html += `
+                            </tbody>
+                        </table>
+                        
+                        <div style="margin-top: 20px; padding: 10px; background: #f0f0f0;">
+                            <p><strong>Total de Horas no Período:</strong> ${totalHorasFormat}</p>
+                            <p><strong>Total de Horas Extras:</strong> ${totalExtrasFormat}</p>
+                        </div>
+                        
+                        <div class="assinatura">
+                            <div class="linha-assinatura">Responsável RH</div>
+                            <div class="linha-assinatura">Funcionário</div>
+                        </div>
+                        
+                        <div class="footer">
+                            <p>Relatório gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+                        </div>
+                    </body>
+                    </html>
+                `;
+
+                const janela = window.open('', '_blank');
+                janela.document.write(html);
+                janela.document.close();
+                
+                setTimeout(() => {
+                    if (confirm('Deseja imprimir agora?')) {
+                        janela.print();
+                    }
+                }, 500);
+                
+                this.mostrarAlerta('Relatório gerado!', 'success');
             }
 
             // ========== REGISTROS ==========
@@ -1685,7 +2295,14 @@
                     funcionarioCpf: document.getElementById('faltaFuncionario').value,
                     data: document.getElementById('faltaData').value,
                     tipo: document.getElementById('faltaTipo').value,
-                    motivo: document.getElementById('faltaMotivo').value
+                    motivo: document.getElementById('faltaMotivo').value,
+                    documentos: arquivosSelecionados.map(f => ({
+                        nome: f.name,
+                        tipo: f.type,
+                        tamanho: f.size,
+                        dataUrl: URL.createObjectURL(f),
+                        data: new Date().toISOString()
+                    }))
                 };
                 
                 if (!dados.funcionarioCpf || !dados.data) {
@@ -1693,13 +2310,27 @@
                     return;
                 }
                 
-                this.faltas.push({ id: Date.now(), ...dados });
+                if (dados.tipo === 'justificada' && arquivosSelecionados.length === 0) {
+                    this.mostrarAlerta('Anexe pelo menos um documento para falta justificada!', 'warning');
+                    return;
+                }
+                
+                this.faltas.push({ 
+                    id: Date.now(), 
+                    ...dados
+                });
+                
                 this.salvarDados();
                 this.atualizarTabelaFaltas();
                 this.atualizarDashboard();
                 this.mostrarAlerta('Falta registrada!', 'success');
                 
                 document.getElementById('faltaMotivo').value = '';
+                document.getElementById('fileList').innerHTML = '';
+                document.getElementById('imagePreview').innerHTML = '';
+                document.getElementById('progressBar').style.display = 'none';
+                document.getElementById('arquivoSelecionado').textContent = 'Nenhum arquivo selecionado';
+                arquivosSelecionados = [];
             }
 
             cadastrarFerias() {
@@ -1829,6 +2460,7 @@
         window.toggleFuncionarioStatus = (cpf) => sistema.toggleFuncionarioStatus(cpf);
         window.filtrarRegistros = () => sistema.filtrarRegistros();
         window.exportarCSV = () => sistema.exportarCSV();
+        window.gerarPDF = () => sistema.gerarPDF();
         window.registrarFalta = () => sistema.registrarFalta();
         window.cadastrarFerias = () => sistema.cadastrarFerias();
         window.registrarLicenca = () => sistema.registrarLicenca();
@@ -1874,8 +2506,10 @@
         window.onclick = (e) => {
             const modal = document.getElementById('modalExcluir');
             const modalRec = document.getElementById('modalRecuperarSenha');
+            const modalDocs = document.getElementById('modalVisualizarDocs');
             if (e.target === modal) fecharModal();
             if (e.target === modalRec) fecharModalRecuperar();
+            if (e.target === modalDocs) fecharModalDocs();
         };
     </script>
 </body>
