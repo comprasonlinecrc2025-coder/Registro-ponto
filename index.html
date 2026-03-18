@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oficial de Registro Civil - Sistemas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .company-badge {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .sistemas {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .sistema-btn {
+            display: block;
+            padding: 25px;
+            border-radius: 15px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .sistema-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .btn-financeiro {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+        }
+
+        .btn-funcionario {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+        }
+
+        .sistema-btn small {
+            display: block;
+            font-size: 14px;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #666;
+            text-align: left;
+        }
+
+        .info-box strong {
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>🏢 Oficial de Registro Civil</h1>
+                <p>Mogi das Cruzes - SP</p>
+                <div class="company-badge">
+                    CNPJ: 51.374.270/0001-01
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>🔐 ACESSO RESTRITO AO CARTÓRIO</strong>
+                <p>Estes sistemas são de uso exclusivo dos funcionários do cartório.</p>
+                <p style="margin-top: 10px; color: #28a745;">✓ Autenticação por senha em cada sistema</p>
+            </div>
+
+            <div class="sistemas">
+                <a href="FINANCEIRO2.HTML" class="sistema-btn btn-financeiro">
+                    💰 Sistema Financeiro
+                    <small>Administração, cadastros e relatórios</small>
+                </a>
+
+                <a href="FUNCIONÁRIO.HTML" class="sistema-btn btn-funcionario">
+                    📋 Registro de Ponto
+                    <small>Funcionários registram entrada, almoço e saída</small>
+                </a>
+            </div>
+
+            <div class="info-box">
+                <strong>⚠️ IMPORTANTE:</strong>
+                <p>• Ao clicar em um sistema, será solicitada a senha de acesso do cartório</p>
+                <p>• A senha é a mesma para ambos os sistemas</p>
+                <p>• Em caso de dúvidas, procure o RH</p>
+            </div>
+
+            <div class="footer">
+                Sistema de Registro de Ponto - Versão 6.0
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Script para verificar se os arquivos existem
+        console.log('Página inicial carregada');
+    </script>
+</body>
+</html>
