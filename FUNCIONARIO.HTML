@@ -354,6 +354,39 @@
     </style>
 </head>
 <body>
+    <script>
+        // ===== AUTENTICAÇÃO OFUSCADA DO CARTÓRIO =====
+        (function() {
+            // Senha ofuscada: Registroponto51374@
+            // Convertida para códigos charCode para não aparecer diretamente
+            const senhaOfuscada = [82, 101, 103, 105, 115, 116, 114, 111, 112, 111, 110, 116, 111, 53, 49, 51, 55, 52, 64];
+            const senhaCorreta = senhaOfuscada.map(c => String.fromCharCode(c)).join('');
+            
+            // Verifica se já está autenticado nesta sessão
+            if (!sessionStorage.getItem('acessoCartorio')) {
+                const senhaDigitada = prompt("🔐 ACESSO RESTRITO AO CARTÓRIO\nDigite a senha de acesso:");
+                
+                if (senhaDigitada !== senhaCorreta) {
+                    document.body.innerHTML = `
+                        <div style="text-align: center; margin-top: 100px; font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+                            <div style="background: white; max-width: 400px; margin: 0 auto; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                                <h1 style="color: #dc3545; margin-bottom: 20px;">⛔ Acesso Negado</h1>
+                                <p style="color: #666; margin: 20px 0;">Esta área é restrita aos funcionários do cartório.</p>
+                                <button onclick="location.reload()" style="background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px;">
+                                    Tentar novamente
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    throw new Error("Acesso negado");
+                }
+                
+                // Marca como autenticado para a sessão
+                sessionStorage.setItem('acessoCartorio', 'true');
+            }
+        })();
+    </script>
+
     <div class="container">
         <div class="header">
             <h1>📋 Registro de Ponto</h1>
@@ -500,7 +533,7 @@
             </div>
         </div>
 
-        <div class="footer">Sistema de Ponto v3.0 - Com Recuperação de Senha</div>
+        <div class="footer">Sistema de Ponto v3.0 - Acesso Restrito</div>
     </div>
 
     <script>
