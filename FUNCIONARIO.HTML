@@ -49,6 +49,80 @@
             color: #555;
         }
 
+        /* Tela de Login do Cartório */
+        .login-cartorio {
+            max-width: 400px;
+            margin: 0 auto 20px auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .login-cartorio-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .senha-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .senha-input {
+            width: 100%;
+            padding: 15px;
+            padding-right: 100px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .senha-input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .senha-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 5px 10px;
+        }
+
+        .senha-toggle:hover {
+            color: #764ba2;
+        }
+
+        .link-esqueci-senha {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .link-esqueci-senha a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .link-esqueci-senha a:hover {
+            text-decoration: underline;
+        }
+
         .main-card {
             background: white;
             padding: 40px 30px;
@@ -192,37 +266,6 @@
             margin-bottom: 5px;
         }
 
-        .password-requirements {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-            font-size: 13px;
-        }
-
-        .requirement {
-            color: #666;
-            margin: 5px 0;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .requirement::before {
-            content: "•";
-            position: absolute;
-            left: 5px;
-            color: #667eea;
-        }
-
-        .requirement.met {
-            color: #28a745;
-        }
-
-        .requirement.met::before {
-            content: "✓";
-            color: #28a745;
-        }
-
         .btn-group {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -354,7 +397,37 @@
     </style>
 </head>
 <body>
-    <div class="container" id="sistemaContainer">
+    <!-- TELA DE LOGIN DO CARTÓRIO -->
+    <div id="loginCartorio" class="login-cartorio">
+        <div class="login-cartorio-card">
+            <div class="header">
+                <h1>🔐 Acesso Restrito</h1>
+                <p>Oficial de Registro Civil - Mogi das Cruzes</p>
+                <div class="company-badge">
+                    CNPJ: 51.374.270/0001-01
+                </div>
+            </div>
+
+            <div class="senha-container">
+                <input type="password" id="senhaCartorio" class="senha-input" placeholder="Digite a senha de acesso">
+                <button class="senha-toggle" onclick="toggleSenha()" id="toggleSenhaBtn">👁️ Mostrar</button>
+            </div>
+
+            <div class="link-esqueci-senha">
+                <a onclick="abrirModalEsqueciSenhaCartorio()">Esqueci a senha</a>
+            </div>
+
+            <button class="btn btn-primary btn-login" onclick="verificarSenhaCartorio()">Entrar no Sistema</button>
+
+            <div class="info-box" style="margin-top: 20px;">
+                <strong>ℹ️ Informação:</strong>
+                <p>Esta senha é para acesso aos sistemas do cartório.</p>
+                <p style="font-size: 12px; margin-top: 10px;">Em caso de problemas, contate o administrador.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="sistemaContainer" style="display: none;">
         <div class="header">
             <h1>📋 Registro de Ponto</h1>
             <p>Oficial de Registro Civil - Mogi das Cruzes</p>
@@ -392,36 +465,6 @@
                 </div>
             </div>
 
-            <!-- TELA DE PRIMEIRO ACESSO (criar senha) -->
-            <div id="primeiroAcessoArea" style="display: none;">
-                <h3 style="text-align: center; margin-bottom: 20px;">🆕 Primeiro Acesso</h3>
-                <p style="text-align: center; margin-bottom: 20px;">Crie sua senha de acesso</p>
-                
-                <form onsubmit="criarPrimeiroAcesso(event)">
-                    <div class="form-group">
-                        <label>CPF</label>
-                        <input type="text" id="primeiroCpf" class="form-control" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Nova Senha</label>
-                        <input type="password" id="primeiroNovaSenha" class="form-control" placeholder="Crie sua senha" onkeyup="validarSenha()">
-                    </div>
-                    <div class="form-group">
-                        <label>Confirmar Senha</label>
-                        <input type="password" id="primeiroConfirmarSenha" class="form-control" placeholder="Digite novamente" onkeyup="validarSenha()">
-                    </div>
-
-                    <div class="password-requirements" id="requisitosSenha">
-                        <strong>Requisitos:</strong>
-                        <div class="requirement" id="reqLength">Mínimo 6 caracteres</div>
-                        <div class="requirement" id="reqMatch">Senhas coincidem</div>
-                    </div>
-
-                    <button type="submit" class="btn btn-success" id="btnCriarSenha" disabled>Criar Senha</button>
-                    <button type="button" class="btn btn-danger" onclick="voltarParaLogin()">Cancelar</button>
-                </form>
-            </div>
-
             <!-- TELA DO FUNCIONÁRIO (APÓS LOGIN) -->
             <div id="pontoArea" style="display: none;">
                 <div style="text-align: center; margin-bottom: 20px;">
@@ -457,52 +500,163 @@
                     </div>
                 </div>
 
-                <button class="btn btn-danger" onclick="logout()" style="margin-top: 20px;">Sair</button>
+                <button class="btn btn-danger" onclick="logoutFuncionario()" style="margin-top: 20px;">Sair</button>
             </div>
 
             <div id="alertContainer"></div>
         </div>
-
-        <!-- Modal Esqueci Senha do Funcionário -->
-        <div id="modalEsqueciSenha" class="modal">
-            <div class="modal-content">
-                <h3>🔐 Recuperar Senha</h3>
-                <p>Digite seu CPF para receber as instruções</p>
-                <div class="form-group">
-                    <input type="text" id="esqueciCpf" class="form-control" placeholder="Digite seu CPF" maxlength="11" onkeypress="return onlyNumbers(event)">
-                </div>
-                <div class="modal-buttons">
-                    <button class="btn btn-primary" onclick="enviarRecuperacao()">Enviar</button>
-                    <button class="btn btn-danger" onclick="fecharModalEsqueci()">Cancelar</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal Redefinir Senha do Funcionário -->
-        <div id="modalRedefinirSenha" class="modal">
-            <div class="modal-content">
-                <h3>🔐 Redefinir Senha</h3>
-                <p id="redefinirMensagem"></p>
-                <div class="form-group">
-                    <label>Nova Senha:</label>
-                    <input type="password" id="redefinirNovaSenha" class="form-control" placeholder="Digite a nova senha">
-                </div>
-                <div class="form-group">
-                    <label>Confirmar Senha:</label>
-                    <input type="password" id="redefinirConfirmarSenha" class="form-control" placeholder="Confirme a nova senha">
-                </div>
-                <div class="modal-buttons">
-                    <button class="btn btn-success" onclick="salvarNovaSenha()">Salvar</button>
-                    <button class="btn btn-danger" onclick="fecharModalRedefinir()">Cancelar</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer">Sistema de Ponto v7.0 - Sessão Permanente</div>
     </div>
 
+    <!-- Modal Esqueci Senha do Cartório -->
+    <div id="modalEsqueciSenhaCartorio" class="modal">
+        <div class="modal-content">
+            <h3>🔐 Recuperar Senha do Cartório</h3>
+            <p>Digite a senha mestra para redefinir:</p>
+            <div class="form-group">
+                <input type="password" id="senhaMestra" class="form-control" placeholder="Digite a senha mestra">
+            </div>
+            <div class="form-group">
+                <label>Nova Senha:</label>
+                <input type="password" id="novaSenhaCartorio" class="form-control" placeholder="Digite a nova senha">
+            </div>
+            <div class="form-group">
+                <label>Confirmar Senha:</label>
+                <input type="password" id="confirmarSenhaCartorio" class="form-control" placeholder="Confirme a nova senha">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-success" onclick="redefinirSenhaCartorio()">Salvar</button>
+                <button class="btn btn-danger" onclick="fecharModalEsqueciSenhaCartorio()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Esqueci Senha do Funcionário -->
+    <div id="modalEsqueciSenha" class="modal">
+        <div class="modal-content">
+            <h3>🔐 Recuperar Senha</h3>
+            <p>Digite seu CPF:</p>
+            <div class="form-group">
+                <input type="text" id="esqueciCpf" class="form-control" placeholder="Digite seu CPF" maxlength="11" onkeypress="return onlyNumbers(event)">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="enviarRecuperacao()">Enviar</button>
+                <button class="btn btn-danger" onclick="fecharModalEsqueci()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Redefinir Senha do Funcionário -->
+    <div id="modalRedefinirSenha" class="modal">
+        <div class="modal-content">
+            <h3>🔐 Redefinir Senha</h3>
+            <p id="redefinirMensagem"></p>
+            <div class="form-group">
+                <label>Nova Senha:</label>
+                <input type="password" id="redefinirNovaSenha" class="form-control" placeholder="Digite a nova senha">
+            </div>
+            <div class="form-group">
+                <label>Confirmar Senha:</label>
+                <input type="password" id="redefinirConfirmarSenha" class="form-control" placeholder="Confirme a nova senha">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-success" onclick="salvarNovaSenha()">Salvar</button>
+                <button class="btn btn-danger" onclick="fecharModalRedefinir()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">Sistema de Ponto v6.0 - Data Corrigida</div>
+
     <script>
-        // Função para permitir apenas números
+        // ========== SENHA DO CARTÓRIO ==========
+        let senhaCartorioAtual = "Registroponto51374@";
+        let senhaMestra = "admin51374@";
+        let funcionarioAtual = null;
+        let cpfRecuperar = null;
+
+        // Função para obter a data local do Brasil (formato YYYY-MM-DD)
+        function getDataLocalBrasil() {
+            const agora = new Date();
+            // Ajuste manual para UTC-3 (Brasil)
+            const horaLocal = new Date(agora.getTime() - (3 * 60 * 60 * 1000));
+            const ano = horaLocal.getUTCFullYear();
+            const mes = String(horaLocal.getUTCMonth() + 1).padStart(2, '0');
+            const dia = String(horaLocal.getUTCDate()).padStart(2, '0');
+            return `${ano}-${mes}-${dia}`;
+        }
+
+        // Função para obter a hora local do Brasil (formato HH:MM:SS)
+        function getHoraLocalBrasil() {
+            const agora = new Date();
+            const horaLocal = new Date(agora.getTime() - (3 * 60 * 60 * 1000));
+            const horas = String(horaLocal.getUTCHours()).padStart(2, '0');
+            const minutos = String(horaLocal.getUTCMinutes()).padStart(2, '0');
+            const segundos = String(horaLocal.getUTCSeconds()).padStart(2, '0');
+            return `${horas}:${minutos}:${segundos}`;
+        }
+
+        window.toggleSenha = () => {
+            const input = document.getElementById('senhaCartorio');
+            const btn = document.getElementById('toggleSenhaBtn');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '👁️ Ocultar';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁️ Mostrar';
+            }
+        };
+
+        window.verificarSenhaCartorio = () => {
+            const senha = document.getElementById('senhaCartorio').value;
+            
+            if (senha === senhaCartorioAtual) {
+                document.getElementById('loginCartorio').style.display = 'none';
+                document.getElementById('sistemaContainer').style.display = 'block';
+                iniciarRelogio();
+            } else {
+                alert('Senha incorreta! Tente novamente.');
+            }
+        };
+
+        window.abrirModalEsqueciSenhaCartorio = () => {
+            document.getElementById('modalEsqueciSenhaCartorio').style.display = 'block';
+        };
+
+        window.fecharModalEsqueciSenhaCartorio = () => {
+            document.getElementById('modalEsqueciSenhaCartorio').style.display = 'none';
+            document.getElementById('senhaMestra').value = '';
+            document.getElementById('novaSenhaCartorio').value = '';
+            document.getElementById('confirmarSenhaCartorio').value = '';
+        };
+
+        window.redefinirSenhaCartorio = () => {
+            const senhaMestraDigitada = document.getElementById('senhaMestra').value;
+            const novaSenha = document.getElementById('novaSenhaCartorio').value;
+            const confirmarSenha = document.getElementById('confirmarSenhaCartorio').value;
+
+            if (senhaMestraDigitada !== senhaMestra) {
+                alert('Senha mestra incorreta!');
+                return;
+            }
+
+            if (!novaSenha || novaSenha.length < 6) {
+                alert('A nova senha deve ter pelo menos 6 caracteres!');
+                return;
+            }
+
+            if (novaSenha !== confirmarSenha) {
+                alert('As senhas não coincidem!');
+                return;
+            }
+
+            senhaCartorioAtual = novaSenha;
+            alert('Senha alterada com sucesso!');
+            fecharModalEsqueciSenhaCartorio();
+        };
+
+        // ========== FUNÇÕES DO SISTEMA ==========
         window.onlyNumbers = (e) => {
             const charCode = (e.which) ? e.which : e.keyCode;
             if (charCode > 31 && (charCode < 48 || charCode > 57)) {
@@ -511,443 +665,267 @@
             return true;
         };
 
-        // ========== VALIDAÇÃO DE CPF ==========
-        function validarCPF(cpf) {
-            cpf = cpf.replace(/\D/g, '');
-            if (cpf.length !== 11) return false;
-            if (/^(\d)\1+$/.test(cpf)) return false;
-            
-            let soma = 0;
-            for (let i = 0; i < 9; i++) soma += parseInt(cpf.charAt(i)) * (10 - i);
-            let resto = (soma * 10) % 11;
-            let digito1 = (resto === 10 || resto === 11) ? 0 : resto;
-            if (digito1 !== parseInt(cpf.charAt(9))) return false;
-            
-            soma = 0;
-            for (let i = 0; i < 10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
-            resto = (soma * 10) % 11;
-            let digito2 = (resto === 10 || resto === 11) ? 0 : resto;
-            if (digito2 !== parseInt(cpf.charAt(10))) return false;
-            
-            return true;
+        function iniciarRelogio() {
+            atualizarRelogio();
+            setInterval(atualizarRelogio, 1000);
         }
 
-        class SistemaPontoFuncionario {
-            constructor() {
-                this.funcionarioAtual = null;
-                this.funcionarios = [];
-                this.registros = [];
-                this.cpfRecuperar = null;
+        function atualizarRelogio() {
+            // Usar data local do Brasil
+            const dataLocal = getDataLocalBrasil();
+            const horaLocal = getHoraLocalBrasil();
+            
+            // Formatar para exibição
+            const [ano, mes, dia] = dataLocal.split('-');
+            document.getElementById('clockTime').textContent = horaLocal;
+            document.getElementById('clockDate').textContent = `${dia}/${mes}/${ano}`;
+        }
+
+        function carregarFuncionarios() {
+            try {
+                return JSON.parse(localStorage.getItem('funcionarios')) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function carregarRegistros() {
+            try {
+                return JSON.parse(localStorage.getItem('registrosPonto')) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function salvarRegistros(registros) {
+            localStorage.setItem('registrosPonto', JSON.stringify(registros));
+        }
+
+        function mostrarAlerta(mensagem, tipo) {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${tipo}`;
+            alert.textContent = mensagem;
+            
+            container.innerHTML = '';
+            container.appendChild(alert);
+            
+            setTimeout(() => alert.remove(), 3000);
+        }
+
+        window.fazerLoginFuncionario = (e) => {
+            e.preventDefault();
+            
+            const cpf = document.getElementById('loginCpf').value.trim();
+            const senha = document.getElementById('loginSenha').value;
+            
+            if (!cpf || !senha) {
+                mostrarAlerta('Preencha todos os campos!', 'warning');
+                return;
+            }
+            
+            const funcionarios = carregarFuncionarios();
+            const funcionario = funcionarios.find(f => f.cpf === cpf && f.senha === senha && f.ativo !== false);
+            
+            if (funcionario) {
+                funcionarioAtual = funcionario;
                 
-                this.carregarDados();
-                this.iniciarRelogio();
-                this.verificarSessao();
-            }
-
-            carregarDados() {
-                const funcs = localStorage.getItem('funcionarios');
-                this.funcionarios = funcs ? JSON.parse(funcs) : [];
-                
-                const regs = localStorage.getItem('registrosPonto');
-                this.registros = regs ? JSON.parse(regs) : [];
-            }
-
-            salvarDados() {
-                localStorage.setItem('funcionarios', JSON.stringify(this.funcionarios));
-                localStorage.setItem('registrosPonto', JSON.stringify(this.registros));
-            }
-
-            iniciarRelogio() {
-                const atualizar = () => {
-                    const agora = new Date();
-                    
-                    const horas = agora.getHours().toString().padStart(2, '0');
-                    const minutos = agora.getMinutes().toString().padStart(2, '0');
-                    const segundos = agora.getSeconds().toString().padStart(2, '0');
-                    
-                    document.getElementById('clockTime').textContent = `${horas}:${minutos}:${segundos}`;
-                    
-                    const dia = agora.getDate().toString().padStart(2, '0');
-                    const mes = (agora.getMonth() + 1).toString().padStart(2, '0');
-                    const ano = agora.getFullYear();
-                    
-                    document.getElementById('clockDate').textContent = `${dia}/${mes}/${ano}`;
-                };
-                
-                atualizar();
-                setInterval(atualizar, 1000);
-            }
-
-            // ========== VERIFICAR SESSÃO ==========
-            verificarSessao() {
-                const sessao = localStorage.getItem('sessaoFuncionario');
-                if (sessao) {
-                    const dados = JSON.parse(sessao);
-                    const funcionario = this.funcionarios.find(f => f.cpf === dados.cpf);
-                    if (funcionario && funcionario.ativo) {
-                        this.funcionarioAtual = funcionario;
-                        this.mostrarTelaPonto();
-                    } else {
-                        localStorage.removeItem('sessaoFuncionario');
-                    }
-                }
-            }
-
-            mostrarAlerta(mensagem, tipo) {
-                const container = document.getElementById('alertContainer');
-                const alert = document.createElement('div');
-                alert.className = `alert alert-${tipo}`;
-                alert.textContent = mensagem;
-                
-                container.innerHTML = '';
-                container.appendChild(alert);
-                
-                setTimeout(() => alert.remove(), 3000);
-            }
-
-            validarSenha(senha) {
-                return {
-                    length: senha.length >= 6
-                };
-            }
-
-            // ========== LOGIN ==========
-            fazerLogin(cpf, senha) {
-                if (!validarCPF(cpf)) {
-                    this.mostrarAlerta('CPF inválido!', 'danger');
-                    return false;
-                }
-
-                const funcionario = this.funcionarios.find(f => f.cpf === cpf);
-
-                if (!funcionario) {
-                    this.mostrarAlerta('CPF não encontrado!', 'danger');
-                    return false;
-                }
-
-                if (!funcionario.ativo) {
-                    this.mostrarAlerta('Funcionário inativo!', 'warning');
-                    return false;
-                }
-
-                if (!funcionario.senha) {
-                    this.mostrarAlerta('Primeiro acesso! Crie sua senha.', 'info');
-                    cpfPrimeiroAcesso = cpf;
-                    document.getElementById('primeiroCpf').value = cpf;
-                    document.getElementById('loginArea').style.display = 'none';
-                    document.getElementById('primeiroAcessoArea').style.display = 'block';
-                    return false;
-                }
-
-                if (funcionario.senha !== senha) {
-                    this.mostrarAlerta('Senha incorreta!', 'danger');
-                    return false;
-                }
-
-                this.funcionarioAtual = funcionario;
-                
-                // Salvar sessão
-                localStorage.setItem('sessaoFuncionario', JSON.stringify({
-                    cpf: funcionario.cpf,
-                    nome: funcionario.nome,
-                    timestamp: Date.now()
-                }));
-                
-                this.mostrarTelaPonto();
-
-                return true;
-            }
-
-            // ========== PRIMEIRO ACESSO (criar senha) ==========
-            criarPrimeiroAcesso(cpf, senha, confirmar) {
-                if (!validarCPF(cpf)) {
-                    this.mostrarAlerta('CPF inválido!', 'danger');
-                    return false;
-                }
-
-                if (senha !== confirmar) {
-                    this.mostrarAlerta('Senhas não coincidem!', 'warning');
-                    return false;
-                }
-
-                if (senha.length < 6) {
-                    this.mostrarAlerta('Senha deve ter 6+ caracteres!', 'warning');
-                    return false;
-                }
-
-                const funcionario = this.funcionarios.find(f => f.cpf === cpf);
-
-                if (!funcionario) {
-                    this.mostrarAlerta('CPF não encontrado!', 'danger');
-                    return false;
-                }
-
-                if (!funcionario.ativo) {
-                    this.mostrarAlerta('Funcionário inativo!', 'warning');
-                    return false;
-                }
-
-                if (funcionario.senha) {
-                    this.mostrarAlerta('Você já tem senha! Faça login.', 'warning');
-                    this.voltarParaLogin();
-                    return false;
-                }
-
-                funcionario.senha = senha;
-                this.salvarDados();
-
-                this.mostrarAlerta('Senha criada! Faça login.', 'success');
-                
-                document.getElementById('primeiroNovaSenha').value = '';
-                document.getElementById('primeiroConfirmarSenha').value = '';
-                
-                setTimeout(() => {
-                    this.voltarParaLogin();
-                }, 2000);
-
-                return true;
-            }
-
-            voltarParaLogin() {
-                document.getElementById('primeiroAcessoArea').style.display = 'none';
-                document.getElementById('loginArea').style.display = 'block';
-                document.getElementById('loginCpf').value = '';
-                document.getElementById('loginSenha').value = '';
-            }
-
-            mostrarTelaPonto() {
                 document.getElementById('loginArea').style.display = 'none';
-                document.getElementById('primeiroAcessoArea').style.display = 'none';
                 document.getElementById('pontoArea').style.display = 'block';
                 
-                document.getElementById('nomeFuncionario').textContent = this.funcionarioAtual.nome;
-                document.getElementById('matriculaFuncionario').textContent = `Matrícula: ${this.funcionarioAtual.matricula || '---'}`;
+                document.getElementById('nomeFuncionario').textContent = funcionario.nome;
+                document.getElementById('matriculaFuncionario').textContent = `Matrícula: ${funcionario.matricula || '---'}`;
                 
-                const cpfFormatado = this.funcionarioAtual.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                // Formatar CPF para exibição
+                const cpfFormatado = funcionario.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
                 document.getElementById('cpfFuncionario').textContent = `CPF: ${cpfFormatado}`;
                 
-                this.atualizarStatusBotoes();
-                this.atualizarStatusRegistros();
+                atualizarStatusBotoes();
+                mostrarAlerta('Login realizado com sucesso!', 'success');
+            } else {
+                mostrarAlerta('CPF ou senha inválidos!', 'danger');
             }
+        };
 
-            // ========== LOGOUT ==========
-            logout() {
-                this.funcionarioAtual = null;
-                localStorage.removeItem('sessaoFuncionario');
-                
-                document.getElementById('pontoArea').style.display = 'none';
-                document.getElementById('loginArea').style.display = 'block';
-                
-                mudarTab('login');
-                
-                document.getElementById('loginCpf').value = '';
-                document.getElementById('loginSenha').value = '';
-                
-                this.mostrarAlerta('Você saiu', 'success');
-            }
+        window.logoutFuncionario = () => {
+            funcionarioAtual = null;
+            document.getElementById('loginArea').style.display = 'block';
+            document.getElementById('pontoArea').style.display = 'none';
+            document.getElementById('loginCpf').value = '';
+            document.getElementById('loginSenha').value = '';
+            mostrarAlerta('Logout realizado!', 'info');
+        };
 
-            // ========== RECUPERAÇÃO DE SENHA ==========
-            abrirModalEsqueciSenha() {
-                document.getElementById('modalEsqueciSenha').style.display = 'block';
-            }
-
-            fecharModalEsqueci() {
-                document.getElementById('modalEsqueciSenha').style.display = 'none';
-                document.getElementById('esqueciCpf').value = '';
-            }
-
-            enviarRecuperacao() {
-                const cpf = document.getElementById('esqueciCpf').value;
-                
-                if (!validarCPF(cpf)) {
-                    this.mostrarAlerta('CPF inválido!', 'danger');
-                    return;
-                }
-
-                const funcionario = this.funcionarios.find(f => f.cpf === cpf);
-
-                if (!funcionario) {
-                    this.mostrarAlerta('CPF não encontrado!', 'danger');
-                    return;
-                }
-
-                if (!funcionario.ativo) {
-                    this.mostrarAlerta('Funcionário inativo!', 'warning');
-                    return;
-                }
-
-                if (!funcionario.email) {
-                    this.mostrarAlerta('Funcionário sem e-mail cadastrado!', 'warning');
-                    return;
-                }
-
-                this.cpfRecuperar = cpf;
-                this.fecharModalEsqueci();
-                
-                document.getElementById('redefinirMensagem').innerHTML = `Redefinir senha para <strong>${funcionario.nome}</strong>`;
-                document.getElementById('modalRedefinirSenha').style.display = 'block';
-                
-                this.mostrarAlerta(`Instruções enviadas para ${funcionario.email} (simulação)`, 'info');
-            }
-
-            fecharModalRedefinir() {
-                document.getElementById('modalRedefinirSenha').style.display = 'none';
-                document.getElementById('redefinirNovaSenha').value = '';
-                document.getElementById('redefinirConfirmarSenha').value = '';
-                this.cpfRecuperar = null;
-            }
-
-            salvarNovaSenha() {
-                const novaSenha = document.getElementById('redefinirNovaSenha').value;
-                const confirmarSenha = document.getElementById('redefinirConfirmarSenha').value;
-                
-                if (!novaSenha || !confirmarSenha) {
-                    this.mostrarAlerta('Preencha todos os campos!', 'warning');
-                    return;
-                }
-
-                if (novaSenha.length < 6) {
-                    this.mostrarAlerta('Senha deve ter 6+ caracteres!', 'warning');
-                    return;
-                }
-
-                if (novaSenha !== confirmarSenha) {
-                    this.mostrarAlerta('Senhas não coincidem!', 'warning');
-                    return;
-                }
-
-                if (!this.cpfRecuperar) {
-                    this.mostrarAlerta('Erro na recuperação!', 'danger');
-                    return;
-                }
-
-                const funcionario = this.funcionarios.find(f => f.cpf === this.cpfRecuperar);
-                if (funcionario) {
-                    funcionario.senha = novaSenha;
-                    this.salvarDados();
-                    this.mostrarAlerta('Senha alterada com sucesso! Faça login.', 'success');
-                    this.fecharModalRedefinir();
-                    
-                    setTimeout(() => {
-                        mudarTab('login');
-                    }, 2000);
-                }
-            }
-
-            // ========== REGISTRO DE PONTO ==========
-            async registrarPonto(tipo) {
-                if (!this.funcionarioAtual) return;
-
-                const agora = new Date();
-                const dataAtual = agora.toISOString().split('T')[0];
-                const horaAtual = agora.toTimeString().split(' ')[0];
-
-                let registroHoje = this.registros.find(r => 
-                    r.data === dataAtual && r.funcionarioCpf === this.funcionarioAtual.cpf
-                );
-
-                if (!registroHoje) {
-                    registroHoje = {
-                        data: dataAtual,
-                        funcionarioCpf: this.funcionarioAtual.cpf,
-                        funcionarioNome: this.funcionarioAtual.nome,
-                        funcionarioMatricula: this.funcionarioAtual.matricula,
-                        entrada: null,
-                        almoco: null,
-                        voltaAlmoco: null,
-                        saida: null
-                    };
-                    this.registros.push(registroHoje);
-                }
-
-                switch(tipo) {
-                    case 'entrada':
-                        if (registroHoje.entrada) {
-                            this.mostrarAlerta('Entrada já registrada!', 'warning');
-                            return;
-                        }
-                        registroHoje.entrada = horaAtual;
-                        break;
-                    case 'almoco':
-                        if (!registroHoje.entrada) {
-                            this.mostrarAlerta('Registre entrada primeiro!', 'warning');
-                            return;
-                        }
-                        if (registroHoje.almoco) {
-                            this.mostrarAlerta('Almoço já registrado!', 'warning');
-                            return;
-                        }
-                        registroHoje.almoco = horaAtual;
-                        break;
-                    case 'volta':
-                        if (!registroHoje.almoco) {
-                            this.mostrarAlerta('Registre almoço primeiro!', 'warning');
-                            return;
-                        }
-                        if (registroHoje.voltaAlmoco) {
-                            this.mostrarAlerta('Volta já registrada!', 'warning');
-                            return;
-                        }
-                        registroHoje.voltaAlmoco = horaAtual;
-                        break;
-                    case 'saida':
-                        if (!registroHoje.voltaAlmoco) {
-                            this.mostrarAlerta('Registre volta primeiro!', 'warning');
-                            return;
-                        }
-                        if (registroHoje.saida) {
-                            this.mostrarAlerta('Saída já registrada!', 'warning');
-                            return;
-                        }
-                        registroHoje.saida = horaAtual;
-                        break;
-                }
-
-                this.salvarDados();
-                
-                this.atualizarStatusBotoes();
-                this.atualizarStatusRegistros();
-                this.mostrarAlerta(`${tipo} registrado!`, 'success');
-            }
-
-            atualizarStatusBotoes() {
-                const hoje = new Date().toISOString().split('T')[0];
-                const registroHoje = this.registros.find(r => 
-                    r.data === hoje && r.funcionarioCpf === this.funcionarioAtual.cpf
-                );
-
-                document.getElementById('btnEntrada').disabled = registroHoje?.entrada ? true : false;
-                document.getElementById('btnAlmoco').disabled = !registroHoje?.entrada || registroHoje?.almoco ? true : false;
-                document.getElementById('btnVolta').disabled = !registroHoje?.almoco || registroHoje?.voltaAlmoco ? true : false;
-                document.getElementById('btnSaida').disabled = !registroHoje?.voltaAlmoco || registroHoje?.saida ? true : false;
-            }
-
-            atualizarStatusRegistros() {
-                const hoje = new Date().toISOString().split('T')[0];
-                const registroHoje = this.registros.find(r => 
-                    r.data === hoje && r.funcionarioCpf === this.funcionarioAtual.cpf
-                );
-
-                const setStatus = (id, value) => {
-                    const el = document.getElementById(id);
-                    if (value) {
-                        el.innerHTML = '✅ Registrado';
-                        el.className = 'status-value registered';
-                    } else {
-                        el.innerHTML = '⏳ Pendente';
-                        el.className = 'status-value pending';
-                    }
-                };
-
-                setStatus('statusEntrada', registroHoje?.entrada);
-                setStatus('statusAlmoco', registroHoje?.almoco);
-                setStatus('statusVolta', registroHoje?.voltaAlmoco);
-                setStatus('statusSaida', registroHoje?.saida);
-            }
+        function atualizarStatusBotoes() {
+            if (!funcionarioAtual) return;
+            
+            const hoje = getDataLocalBrasil();
+            const registros = carregarRegistros();
+            const registroHoje = registros.find(r => 
+                r.funcionarioCpf === funcionarioAtual.cpf && r.data === hoje
+            );
+            
+            // Atualizar botões
+            document.getElementById('btnEntrada').disabled = registroHoje?.entrada ? true : false;
+            document.getElementById('btnAlmoco').disabled = !registroHoje?.entrada || registroHoje?.almoco ? true : false;
+            document.getElementById('btnVolta').disabled = !registroHoje?.almoco || registroHoje?.voltaAlmoco ? true : false;
+            document.getElementById('btnSaida').disabled = !registroHoje?.voltaAlmoco || registroHoje?.saida ? true : false;
+            
+            // Atualizar status
+            document.getElementById('statusEntrada').innerHTML = registroHoje?.entrada ? 
+                `<span class="registered">✅ ${registroHoje.entrada}</span>` : 
+                '<span class="pending">⏳ Pendente</span>';
+            
+            document.getElementById('statusAlmoco').innerHTML = registroHoje?.almoco ? 
+                `<span class="registered">✅ ${registroHoje.almoco}</span>` : 
+                '<span class="pending">⏳ Pendente</span>';
+            
+            document.getElementById('statusVolta').innerHTML = registroHoje?.voltaAlmoco ? 
+                `<span class="registered">✅ ${registroHoje.voltaAlmoco}</span>` : 
+                '<span class="pending">⏳ Pendente</span>';
+            
+            document.getElementById('statusSaida').innerHTML = registroHoje?.saida ? 
+                `<span class="registered">✅ ${registroHoje.saida}</span>` : 
+                '<span class="pending">⏳ Pendente</span>';
         }
 
-        let cpfPrimeiroAcesso = null;
-        const sistema = new SistemaPontoFuncionario();
+        window.registrarPonto = (tipo) => {
+            if (!funcionarioAtual) return;
+            
+            // CORREÇÃO: Usar data e hora local do Brasil
+            const dataLocal = getDataLocalBrasil();
+            const horaLocal = getHoraLocalBrasil();
+            
+            console.log('Registrando ponto:', { tipo, dataLocal, horaLocal, funcionario: funcionarioAtual.nome });
+            
+            const registros = carregarRegistros();
+            let registroHoje = registros.find(r => 
+                r.funcionarioCpf === funcionarioAtual.cpf && r.data === dataLocal
+            );
+            
+            if (!registroHoje && tipo === 'entrada') {
+                registroHoje = {
+                    id: Date.now(),
+                    funcionarioCpf: funcionarioAtual.cpf,
+                    funcionarioNome: funcionarioAtual.nome,
+                    data: dataLocal,
+                    entrada: horaLocal,
+                    almoco: null,
+                    voltaAlmoco: null,
+                    saida: null
+                };
+                registros.push(registroHoje);
+                mostrarAlerta('✅ Entrada registrada com sucesso!', 'success');
+            } else if (registroHoje) {
+                switch(tipo) {
+                    case 'entrada':
+                        if (!registroHoje.entrada) {
+                            registroHoje.entrada = horaLocal;
+                            mostrarAlerta('✅ Entrada registrada!', 'success');
+                        } else {
+                            mostrarAlerta('⚠️ Entrada já registrada hoje!', 'warning');
+                        }
+                        break;
+                    case 'almoco':
+                        if (registroHoje.entrada && !registroHoje.almoco) {
+                            registroHoje.almoco = horaLocal;
+                            mostrarAlerta('✅ Saída para almoço registrada!', 'success');
+                        } else {
+                            mostrarAlerta('⚠️ Não é possível registrar almoço agora!', 'warning');
+                        }
+                        break;
+                    case 'volta':
+                        if (registroHoje.almoco && !registroHoje.voltaAlmoco) {
+                            registroHoje.voltaAlmoco = horaLocal;
+                            mostrarAlerta('✅ Volta do almoço registrada!', 'success');
+                        } else {
+                            mostrarAlerta('⚠️ Não é possível registrar volta agora!', 'warning');
+                        }
+                        break;
+                    case 'saida':
+                        if (registroHoje.voltaAlmoco && !registroHoje.saida) {
+                            registroHoje.saida = horaLocal;
+                            mostrarAlerta('✅ Saída registrada!', 'success');
+                        } else {
+                            mostrarAlerta('⚠️ Não é possível registrar saída agora!', 'warning');
+                        }
+                        break;
+                }
+            } else {
+                mostrarAlerta('⚠️ Registre a entrada primeiro!', 'warning');
+                return;
+            }
+            
+            salvarRegistros(registros);
+            atualizarStatusBotoes();
+        };
+
+        window.abrirModalEsqueciSenha = () => {
+            document.getElementById('modalEsqueciSenha').style.display = 'block';
+        };
+
+        window.fecharModalEsqueci = () => {
+            document.getElementById('modalEsqueciSenha').style.display = 'none';
+            document.getElementById('esqueciCpf').value = '';
+        };
+
+        window.enviarRecuperacao = () => {
+            const cpf = document.getElementById('esqueciCpf').value.trim();
+            
+            if (!cpf) {
+                alert('Digite seu CPF!');
+                return;
+            }
+            
+            const funcionarios = carregarFuncionarios();
+            const funcionario = funcionarios.find(f => f.cpf === cpf);
+            
+            if (funcionario) {
+                cpfRecuperar = cpf;
+                document.getElementById('modalEsqueciSenha').style.display = 'none';
+                document.getElementById('modalRedefinirSenha').style.display = 'block';
+                document.getElementById('redefinirMensagem').innerHTML = `Redefinir senha de <strong>${funcionario.nome}</strong>`;
+            } else {
+                alert('CPF não encontrado!');
+            }
+        };
+
+        window.fecharModalRedefinir = () => {
+            document.getElementById('modalRedefinirSenha').style.display = 'none';
+            document.getElementById('redefinirNovaSenha').value = '';
+            document.getElementById('redefinirConfirmarSenha').value = '';
+            cpfRecuperar = null;
+        };
+
+        window.salvarNovaSenha = () => {
+            const novaSenha = document.getElementById('redefinirNovaSenha').value;
+            const confirmarSenha = document.getElementById('redefinirConfirmarSenha').value;
+            
+            if (!novaSenha || !confirmarSenha) {
+                alert('Preencha todos os campos!');
+                return;
+            }
+            
+            if (novaSenha.length < 6) {
+                alert('A senha deve ter pelo menos 6 caracteres!');
+                return;
+            }
+            
+            if (novaSenha !== confirmarSenha) {
+                alert('As senhas não coincidem!');
+                return;
+            }
+            
+            const funcionarios = carregarFuncionarios();
+            const funcionario = funcionarios.find(f => f.cpf === cpfRecuperar);
+            
+            if (funcionario) {
+                funcionario.senha = novaSenha;
+                localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
+                alert('✅ Senha alterada com sucesso!');
+                fecharModalRedefinir();
+            }
+        };
 
         window.mudarTab = (tab) => {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -956,53 +934,14 @@
             document.getElementById(`tab-${tab}-func`).classList.add('active');
         };
 
-        window.validarSenha = () => {
-            const senha = document.getElementById('primeiroNovaSenha').value;
-            const confirmar = document.getElementById('primeiroConfirmarSenha').value;
-            const btn = document.getElementById('btnCriarSenha');
-
-            const lengthOk = senha.length >= 6;
-            const matchOk = senha === confirmar && senha.length > 0;
-
-            document.getElementById('reqLength').className = `requirement ${lengthOk ? 'met' : ''}`;
-            document.getElementById('reqMatch').className = `requirement ${matchOk ? 'met' : ''}`;
-
-            btn.disabled = !(lengthOk && matchOk);
-        };
-
-        window.fazerLoginFuncionario = (e) => {
-            e.preventDefault();
-            const cpf = document.getElementById('loginCpf').value;
-            const senha = document.getElementById('loginSenha').value;
-            sistema.fazerLogin(cpf, senha);
-        };
-
-        window.criarPrimeiroAcesso = (e) => {
-            e.preventDefault();
-            const cpf = document.getElementById('primeiroCpf').value;
-            const senha = document.getElementById('primeiroNovaSenha').value;
-            const confirmar = document.getElementById('primeiroConfirmarSenha').value;
-            sistema.criarPrimeiroAcesso(cpf, senha, confirmar);
-        };
-
-        window.voltarParaLogin = () => {
-            sistema.voltarParaLogin();
-        };
-
-        window.registrarPonto = (tipo) => sistema.registrarPonto(tipo);
-        window.logout = () => sistema.logout();
-
-        window.abrirModalEsqueciSenha = () => sistema.abrirModalEsqueciSenha();
-        window.fecharModalEsqueci = () => sistema.fecharModalEsqueci();
-        window.enviarRecuperacao = () => sistema.enviarRecuperacao();
-        window.fecharModalRedefinir = () => sistema.fecharModalRedefinir();
-        window.salvarNovaSenha = () => sistema.salvarNovaSenha();
-
         window.onclick = (e) => {
-            const modalEsqueci = document.getElementById('modalEsqueciSenha');
-            const modalRedefinir = document.getElementById('modalRedefinirSenha');
-            if (e.target === modalEsqueci) sistema.fecharModalEsqueci();
-            if (e.target === modalRedefinir) sistema.fecharModalRedefinir();
+            const modal1 = document.getElementById('modalEsqueciSenhaCartorio');
+            const modal2 = document.getElementById('modalEsqueciSenha');
+            const modal3 = document.getElementById('modalRedefinirSenha');
+            
+            if (e.target === modal1) fecharModalEsqueciSenhaCartorio();
+            if (e.target === modal2) fecharModalEsqueci();
+            if (e.target === modal3) fecharModalRedefinir();
         };
     </script>
 </body>
