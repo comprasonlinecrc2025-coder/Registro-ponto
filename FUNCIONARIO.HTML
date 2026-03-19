@@ -49,80 +49,6 @@
             color: #555;
         }
 
-        /* Tela de Login do Cartório */
-        .login-cartorio {
-            max-width: 400px;
-            margin: 0 auto 20px auto;
-            position: relative;
-            z-index: 2;
-        }
-
-        .login-cartorio-card {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            animation: slideUp 0.5s ease;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .senha-container {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .senha-input {
-            width: 100%;
-            padding: 15px;
-            padding-right: 100px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .senha-input:focus {
-            border-color: #667eea;
-            outline: none;
-        }
-
-        .senha-toggle {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #667eea;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 5px 10px;
-        }
-
-        .senha-toggle:hover {
-            color: #764ba2;
-        }
-
-        .link-esqueci-senha {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-
-        .link-esqueci-senha a {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .link-esqueci-senha a:hover {
-            text-decoration: underline;
-        }
-
         .main-card {
             background: white;
             padding: 40px 30px;
@@ -428,37 +354,7 @@
     </style>
 </head>
 <body>
-    <!-- TELA DE LOGIN DO CARTÓRIO -->
-    <div id="loginCartorio" class="login-cartorio">
-        <div class="login-cartorio-card">
-            <div class="header">
-                <h1>🔐 Acesso Restrito</h1>
-                <p>Oficial de Registro Civil - Mogi das Cruzes</p>
-                <div class="company-badge">
-                    CNPJ: 51.374.270/0001-01
-                </div>
-            </div>
-
-            <div class="senha-container">
-                <input type="password" id="senhaCartorio" class="senha-input" placeholder="Digite a senha de acesso">
-                <button class="senha-toggle" onclick="toggleSenha()" id="toggleSenhaBtn">👁️ Mostrar</button>
-            </div>
-
-            <div class="link-esqueci-senha">
-                <a onclick="abrirModalEsqueciSenhaCartorio()">Esqueci a senha</a>
-            </div>
-
-            <button class="btn btn-primary btn-login" onclick="verificarSenhaCartorio()">Entrar no Sistema</button>
-
-            <div class="info-box" style="margin-top: 20px;">
-                <strong>ℹ️ Informação:</strong>
-                <p>Esta senha é para acesso aos sistemas do cartório.</p>
-                <p style="font-size: 12px; margin-top: 10px;">Em caso de problemas, contate o administrador.</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="container" id="sistemaContainer" style="display: none;">
+    <div class="container" id="sistemaContainer">
         <div class="header">
             <h1>📋 Registro de Ponto</h1>
             <p>Oficial de Registro Civil - Mogi das Cruzes</p>
@@ -567,29 +463,6 @@
             <div id="alertContainer"></div>
         </div>
 
-        <!-- Modal Esqueci Senha do Cartório -->
-        <div id="modalEsqueciSenhaCartorio" class="modal">
-            <div class="modal-content">
-                <h3>🔐 Recuperar Senha do Cartório</h3>
-                <p>Digite a senha mestra para redefinir:</p>
-                <div class="form-group">
-                    <input type="password" id="senhaMestra" class="form-control" placeholder="Digite a senha mestra">
-                </div>
-                <div class="form-group">
-                    <label>Nova Senha:</label>
-                    <input type="password" id="novaSenhaCartorio" class="form-control" placeholder="Digite a nova senha">
-                </div>
-                <div class="form-group">
-                    <label>Confirmar Senha:</label>
-                    <input type="password" id="confirmarSenhaCartorio" class="form-control" placeholder="Confirme a nova senha">
-                </div>
-                <div class="modal-buttons">
-                    <button class="btn btn-success" onclick="redefinirSenhaCartorio()">Salvar</button>
-                    <button class="btn btn-danger" onclick="fecharModalEsqueciSenhaCartorio()">Cancelar</button>
-                </div>
-            </div>
-        </div>
-
         <!-- Modal Esqueci Senha do Funcionário -->
         <div id="modalEsqueciSenha" class="modal">
             <div class="modal-content">
@@ -625,75 +498,10 @@
             </div>
         </div>
 
-        <div class="footer">Sistema de Ponto v6.0 - Acesso Seguro</div>
+        <div class="footer">Sistema de Ponto v7.0 - Sessão Permanente</div>
     </div>
 
     <script>
-        // ========== SENHA DO CARTÓRIO ==========
-        let senhaCartorioAtual = "Registroponto51374@";
-        let senhaMestra = "admin51374@";
-        let cpfPrimeiroAcesso = null;
-
-        window.toggleSenha = () => {
-            const input = document.getElementById('senhaCartorio');
-            const btn = document.getElementById('toggleSenhaBtn');
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                btn.textContent = '👁️ Ocultar';
-            } else {
-                input.type = 'password';
-                btn.textContent = '👁️ Mostrar';
-            }
-        };
-
-        window.verificarSenhaCartorio = () => {
-            const senha = document.getElementById('senhaCartorio').value;
-            
-            if (senha === senhaCartorioAtual) {
-                document.getElementById('loginCartorio').style.display = 'none';
-                document.getElementById('sistemaContainer').style.display = 'block';
-            } else {
-                alert('Senha incorreta! Tente novamente.');
-            }
-        };
-
-        window.abrirModalEsqueciSenhaCartorio = () => {
-            document.getElementById('modalEsqueciSenhaCartorio').style.display = 'block';
-        };
-
-        window.fecharModalEsqueciSenhaCartorio = () => {
-            document.getElementById('modalEsqueciSenhaCartorio').style.display = 'none';
-            document.getElementById('senhaMestra').value = '';
-            document.getElementById('novaSenhaCartorio').value = '';
-            document.getElementById('confirmarSenhaCartorio').value = '';
-        };
-
-        window.redefinirSenhaCartorio = () => {
-            const senhaMestraDigitada = document.getElementById('senhaMestra').value;
-            const novaSenha = document.getElementById('novaSenhaCartorio').value;
-            const confirmarSenha = document.getElementById('confirmarSenhaCartorio').value;
-
-            if (senhaMestraDigitada !== senhaMestra) {
-                alert('Senha mestra incorreta!');
-                return;
-            }
-
-            if (!novaSenha || novaSenha.length < 6) {
-                alert('A nova senha deve ter pelo menos 6 caracteres!');
-                return;
-            }
-
-            if (novaSenha !== confirmarSenha) {
-                alert('As senhas não coincidem!');
-                return;
-            }
-
-            senhaCartorioAtual = novaSenha;
-            alert('Senha alterada com sucesso!');
-            fecharModalEsqueciSenhaCartorio();
-        };
-
         // Função para permitir apenas números
         window.onlyNumbers = (e) => {
             const charCode = (e.which) ? e.which : e.keyCode;
@@ -733,6 +541,7 @@
                 
                 this.carregarDados();
                 this.iniciarRelogio();
+                this.verificarSessao();
             }
 
             carregarDados() {
@@ -767,6 +576,21 @@
                 
                 atualizar();
                 setInterval(atualizar, 1000);
+            }
+
+            // ========== VERIFICAR SESSÃO ==========
+            verificarSessao() {
+                const sessao = localStorage.getItem('sessaoFuncionario');
+                if (sessao) {
+                    const dados = JSON.parse(sessao);
+                    const funcionario = this.funcionarios.find(f => f.cpf === dados.cpf);
+                    if (funcionario && funcionario.ativo) {
+                        this.funcionarioAtual = funcionario;
+                        this.mostrarTelaPonto();
+                    } else {
+                        localStorage.removeItem('sessaoFuncionario');
+                    }
+                }
             }
 
             mostrarAlerta(mensagem, tipo) {
@@ -821,6 +645,14 @@
                 }
 
                 this.funcionarioAtual = funcionario;
+                
+                // Salvar sessão
+                localStorage.setItem('sessaoFuncionario', JSON.stringify({
+                    cpf: funcionario.cpf,
+                    nome: funcionario.nome,
+                    timestamp: Date.now()
+                }));
+                
                 this.mostrarTelaPonto();
 
                 return true;
@@ -881,7 +713,6 @@
                 document.getElementById('loginArea').style.display = 'block';
                 document.getElementById('loginCpf').value = '';
                 document.getElementById('loginSenha').value = '';
-                cpfPrimeiroAcesso = null;
             }
 
             mostrarTelaPonto() {
@@ -899,9 +730,10 @@
                 this.atualizarStatusRegistros();
             }
 
-            // ========== LOGOUT LIMPO ==========
+            // ========== LOGOUT ==========
             logout() {
                 this.funcionarioAtual = null;
+                localStorage.removeItem('sessaoFuncionario');
                 
                 document.getElementById('pontoArea').style.display = 'none';
                 document.getElementById('loginArea').style.display = 'block';
@@ -1114,6 +946,7 @@
             }
         }
 
+        let cpfPrimeiroAcesso = null;
         const sistema = new SistemaPontoFuncionario();
 
         window.mudarTab = (tab) => {
@@ -1168,10 +1001,8 @@
         window.onclick = (e) => {
             const modalEsqueci = document.getElementById('modalEsqueciSenha');
             const modalRedefinir = document.getElementById('modalRedefinirSenha');
-            const modalCartorio = document.getElementById('modalEsqueciSenhaCartorio');
             if (e.target === modalEsqueci) sistema.fecharModalEsqueci();
             if (e.target === modalRedefinir) sistema.fecharModalRedefinir();
-            if (e.target === modalCartorio) fecharModalEsqueciSenhaCartorio();
         };
     </script>
 </body>
