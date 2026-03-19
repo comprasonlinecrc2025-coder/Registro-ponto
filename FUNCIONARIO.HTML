@@ -49,6 +49,80 @@
             color: #555;
         }
 
+        /* Tela de Login do Cartório */
+        .login-cartorio {
+            max-width: 400px;
+            margin: 0 auto 20px auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .login-cartorio-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .senha-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .senha-input {
+            width: 100%;
+            padding: 15px;
+            padding-right: 100px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .senha-input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .senha-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 5px 10px;
+        }
+
+        .senha-toggle:hover {
+            color: #764ba2;
+        }
+
+        .link-esqueci-senha {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .link-esqueci-senha a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .link-esqueci-senha a:hover {
+            text-decoration: underline;
+        }
+
         .main-card {
             background: white;
             padding: 40px 30px;
@@ -354,35 +428,37 @@
     </style>
 </head>
 <body>
-    <script>
-        // ===== AUTENTICAÇÃO OFUSCADA DO CARTÓRIO =====
-        (function() {
-            const senhaOfuscada = [82, 101, 103, 105, 115, 116, 114, 111, 112, 111, 110, 116, 111, 53, 49, 51, 55, 52, 64];
-            const senhaCorreta = senhaOfuscada.map(c => String.fromCharCode(c)).join('');
-            
-            if (!sessionStorage.getItem('acessoCartorio')) {
-                const senhaDigitada = prompt("🔐 ACESSO RESTRITO AO CARTÓRIO\nDigite a senha de acesso:");
-                
-                if (senhaDigitada !== senhaCorreta) {
-                    document.body.innerHTML = `
-                        <div style="text-align: center; margin-top: 100px; font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
-                            <div style="background: white; max-width: 400px; margin: 0 auto; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                                <h1 style="color: #dc3545; margin-bottom: 20px;">⛔ Acesso Negado</h1>
-                                <p style="color: #666; margin: 20px 0;">Esta área é restrita aos funcionários do cartório.</p>
-                                <button onclick="location.reload()" style="background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px;">
-                                    Tentar novamente
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    throw new Error("Acesso negado");
-                }
-                sessionStorage.setItem('acessoCartorio', 'true');
-            }
-        })();
-    </script>
+    <!-- TELA DE LOGIN DO CARTÓRIO -->
+    <div id="loginCartorio" class="login-cartorio">
+        <div class="login-cartorio-card">
+            <div class="header">
+                <h1>🔐 Acesso Restrito</h1>
+                <p>Oficial de Registro Civil - Mogi das Cruzes</p>
+                <div class="company-badge">
+                    CNPJ: 51.374.270/0001-01
+                </div>
+            </div>
 
-    <div class="container">
+            <div class="senha-container">
+                <input type="password" id="senhaCartorio" class="senha-input" placeholder="Digite a senha de acesso">
+                <button class="senha-toggle" onclick="toggleSenha()" id="toggleSenhaBtn">👁️ Mostrar</button>
+            </div>
+
+            <div class="link-esqueci-senha">
+                <a onclick="abrirModalEsqueciSenhaCartorio()">Esqueci a senha</a>
+            </div>
+
+            <button class="btn btn-primary btn-login" onclick="verificarSenhaCartorio()">Entrar no Sistema</button>
+
+            <div class="info-box" style="margin-top: 20px;">
+                <strong>ℹ️ Informação:</strong>
+                <p>Esta senha é para acesso aos sistemas do cartório.</p>
+                <p style="font-size: 12px; margin-top: 10px;">Em caso de problemas, contate o administrador.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="sistemaContainer" style="display: none;">
         <div class="header">
             <h1>📋 Registro de Ponto</h1>
             <p>Oficial de Registro Civil - Mogi das Cruzes</p>
@@ -395,11 +471,10 @@
                 <div class="clock-date" id="clockDate">--/--/----</div>
             </div>
 
-            <!-- TELA DE LOGIN -->
+            <!-- TELA DE LOGIN DO FUNCIONÁRIO -->
             <div id="loginArea">
                 <div class="tab-buttons">
                     <button class="tab-btn active" onclick="mudarTab('login')">🔐 Login</button>
-                    <button class="tab-btn" onclick="mudarTab('primeiroAcesso')">🆕 Primeiro Acesso</button>
                 </div>
 
                 <!-- Aba Login -->
@@ -418,37 +493,6 @@
                         </div>
                         <button type="submit" class="btn btn-primary">Entrar</button>
                     </form>
-                </div>
-
-                <!-- Aba Primeiro Acesso (criar senha) -->
-                <div id="tab-primeiroAcesso-func" class="tab-content">
-                    <form onsubmit="criarPrimeiroAcessoFuncionario(event)">
-                        <div class="form-group">
-                            <label>CPF (apenas números)</label>
-                            <input type="text" id="primeiroCpf" class="form-control" placeholder="Digite seu CPF" maxlength="11" onkeypress="return onlyNumbers(event)">
-                        </div>
-                        <div class="form-group">
-                            <label>Nova Senha</label>
-                            <input type="password" id="primeiroNovaSenha" class="form-control" placeholder="Crie sua senha" onkeyup="validarSenha()">
-                        </div>
-                        <div class="form-group">
-                            <label>Confirmar Senha</label>
-                            <input type="password" id="primeiroConfirmarSenha" class="form-control" placeholder="Digite novamente" onkeyup="validarSenha()">
-                        </div>
-
-                        <div class="password-requirements" id="requisitosSenha">
-                            <strong>Requisitos:</strong>
-                            <div class="requirement" id="reqLength">Mínimo 6 caracteres</div>
-                            <div class="requirement" id="reqMatch">Senhas coincidem</div>
-                        </div>
-
-                        <button type="submit" class="btn btn-success" id="btnCriarSenha" disabled>Criar Senha</button>
-                    </form>
-
-                    <div class="info-box" style="margin-top: 20px;">
-                        <strong>ℹ️ Primeiro acesso?</strong>
-                        <p>Digite seu CPF e crie uma senha.</p>
-                    </div>
                 </div>
             </div>
 
@@ -493,7 +537,30 @@
             <div id="alertContainer"></div>
         </div>
 
-        <!-- Modal Esqueci Senha -->
+        <!-- Modal Esqueci Senha do Cartório -->
+        <div id="modalEsqueciSenhaCartorio" class="modal">
+            <div class="modal-content">
+                <h3>🔐 Recuperar Senha do Cartório</h3>
+                <p>Digite a senha mestra para redefinir:</p>
+                <div class="form-group">
+                    <input type="password" id="senhaMestra" class="form-control" placeholder="Digite a senha mestra">
+                </div>
+                <div class="form-group">
+                    <label>Nova Senha:</label>
+                    <input type="password" id="novaSenhaCartorio" class="form-control" placeholder="Digite a nova senha">
+                </div>
+                <div class="form-group">
+                    <label>Confirmar Senha:</label>
+                    <input type="password" id="confirmarSenhaCartorio" class="form-control" placeholder="Confirme a nova senha">
+                </div>
+                <div class="modal-buttons">
+                    <button class="btn btn-success" onclick="redefinirSenhaCartorio()">Salvar</button>
+                    <button class="btn btn-danger" onclick="fecharModalEsqueciSenhaCartorio()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Esqueci Senha do Funcionário -->
         <div id="modalEsqueciSenha" class="modal">
             <div class="modal-content">
                 <h3>🔐 Recuperar Senha</h3>
@@ -508,7 +575,7 @@
             </div>
         </div>
 
-        <!-- Modal Redefinir Senha -->
+        <!-- Modal Redefinir Senha do Funcionário -->
         <div id="modalRedefinirSenha" class="modal">
             <div class="modal-content">
                 <h3>🔐 Redefinir Senha</h3>
@@ -528,10 +595,74 @@
             </div>
         </div>
 
-        <div class="footer">Sistema de Ponto v4.0 - Com Recuperação de Senha</div>
+        <div class="footer">Sistema de Ponto v5.0 - Acesso Seguro</div>
     </div>
 
     <script>
+        // ========== SENHA DO CARTÓRIO ==========
+        let senhaCartorioAtual = "Registroponto51374@";
+        let senhaMestra = "admin51374@";
+
+        window.toggleSenha = () => {
+            const input = document.getElementById('senhaCartorio');
+            const btn = document.getElementById('toggleSenhaBtn');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '👁️ Ocultar';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁️ Mostrar';
+            }
+        };
+
+        window.verificarSenhaCartorio = () => {
+            const senha = document.getElementById('senhaCartorio').value;
+            
+            if (senha === senhaCartorioAtual) {
+                document.getElementById('loginCartorio').style.display = 'none';
+                document.getElementById('sistemaContainer').style.display = 'block';
+            } else {
+                alert('Senha incorreta! Tente novamente.');
+            }
+        };
+
+        window.abrirModalEsqueciSenhaCartorio = () => {
+            document.getElementById('modalEsqueciSenhaCartorio').style.display = 'block';
+        };
+
+        window.fecharModalEsqueciSenhaCartorio = () => {
+            document.getElementById('modalEsqueciSenhaCartorio').style.display = 'none';
+            document.getElementById('senhaMestra').value = '';
+            document.getElementById('novaSenhaCartorio').value = '';
+            document.getElementById('confirmarSenhaCartorio').value = '';
+        };
+
+        window.redefinirSenhaCartorio = () => {
+            const senhaMestraDigitada = document.getElementById('senhaMestra').value;
+            const novaSenha = document.getElementById('novaSenhaCartorio').value;
+            const confirmarSenha = document.getElementById('confirmarSenhaCartorio').value;
+
+            if (senhaMestraDigitada !== senhaMestra) {
+                alert('Senha mestra incorreta!');
+                return;
+            }
+
+            if (!novaSenha || novaSenha.length < 6) {
+                alert('A nova senha deve ter pelo menos 6 caracteres!');
+                return;
+            }
+
+            if (novaSenha !== confirmarSenha) {
+                alert('As senhas não coincidem!');
+                return;
+            }
+
+            senhaCartorioAtual = novaSenha;
+            alert('Senha alterada com sucesso!');
+            fecharModalEsqueciSenhaCartorio();
+        };
+
         // Função para permitir apenas números
         window.onlyNumbers = (e) => {
             const charCode = (e.which) ? e.which : e.keyCode;
@@ -571,6 +702,7 @@
                 
                 this.carregarDados();
                 this.iniciarRelogio();
+                this.verificarPrimeiroAcesso();
             }
 
             carregarDados() {
@@ -607,6 +739,25 @@
                 setInterval(atualizar, 1000);
             }
 
+            verificarPrimeiroAcesso() {
+                // Remove a aba de primeiro acesso - agora o sistema detecta automaticamente
+                const cpfInput = document.getElementById('loginCpf');
+                if (cpfInput) {
+                    cpfInput.addEventListener('blur', () => {
+                        const cpf = cpfInput.value;
+                        if (cpf.length === 11 && validarCPF(cpf)) {
+                            const funcionario = this.funcionarios.find(f => f.cpf === cpf);
+                            if (funcionario && !funcionario.senha) {
+                                this.mostrarAlerta('Primeiro acesso! Crie sua senha.', 'info');
+                                setTimeout(() => {
+                                    window.location.href = 'primeiro_acesso.html?cpf=' + cpf;
+                                }, 2000);
+                            }
+                        }
+                    });
+                }
+            }
+
             mostrarAlerta(mensagem, tipo) {
                 const container = document.getElementById('alertContainer');
                 const alert = document.createElement('div');
@@ -623,56 +774,6 @@
                 return {
                     length: senha.length >= 6
                 };
-            }
-
-            // ========== PRIMEIRO ACESSO ==========
-            criarPrimeiroAcesso(cpf, senha, confirmar) {
-                if (!validarCPF(cpf)) {
-                    this.mostrarAlerta('CPF inválido!', 'danger');
-                    return false;
-                }
-
-                if (senha !== confirmar) {
-                    this.mostrarAlerta('Senhas não coincidem!', 'warning');
-                    return false;
-                }
-
-                if (senha.length < 6) {
-                    this.mostrarAlerta('Senha deve ter 6+ caracteres!', 'warning');
-                    return false;
-                }
-
-                const funcionario = this.funcionarios.find(f => f.cpf === cpf);
-
-                if (!funcionario) {
-                    this.mostrarAlerta('CPF não encontrado!', 'danger');
-                    return false;
-                }
-
-                if (!funcionario.ativo) {
-                    this.mostrarAlerta('Funcionário inativo!', 'warning');
-                    return false;
-                }
-
-                if (funcionario.senha) {
-                    this.mostrarAlerta('Você já tem senha!', 'warning');
-                    return false;
-                }
-
-                funcionario.senha = senha;
-                this.salvarDados();
-
-                this.mostrarAlerta('Senha criada! Faça login.', 'success');
-                
-                document.getElementById('primeiroCpf').value = '';
-                document.getElementById('primeiroNovaSenha').value = '';
-                document.getElementById('primeiroConfirmarSenha').value = '';
-                
-                setTimeout(() => {
-                    mudarTab('login');
-                }, 2000);
-
-                return true;
             }
 
             // ========== LOGIN ==========
@@ -695,8 +796,10 @@
                 }
 
                 if (!funcionario.senha) {
-                    this.mostrarAlerta('Primeiro acesso! Crie sua senha.', 'warning');
-                    setTimeout(() => mudarTab('primeiroAcesso'), 2000);
+                    this.mostrarAlerta('Primeiro acesso! Redirecionando...', 'info');
+                    setTimeout(() => {
+                        this.abrirPrimeiroAcesso(cpf);
+                    }, 2000);
                     return false;
                 }
 
@@ -709,6 +812,11 @@
                 this.mostrarTelaPonto();
 
                 return true;
+            }
+
+            abrirPrimeiroAcesso(cpf) {
+                // Redirecionar para página de primeiro acesso com CPF preenchido
+                window.location.href = 'primeiro_acesso.html?cpf=' + cpf;
             }
 
             mostrarTelaPonto() {
@@ -736,13 +844,6 @@
                 
                 document.getElementById('loginCpf').value = '';
                 document.getElementById('loginSenha').value = '';
-                document.getElementById('primeiroCpf').value = '';
-                document.getElementById('primeiroNovaSenha').value = '';
-                document.getElementById('primeiroConfirmarSenha').value = '';
-                
-                document.getElementById('reqLength').className = 'requirement';
-                document.getElementById('reqMatch').className = 'requirement';
-                document.getElementById('btnCriarSenha').disabled = true;
                 
                 this.mostrarAlerta('Você saiu', 'success');
             }
@@ -786,7 +887,6 @@
                 this.cpfRecuperar = cpf;
                 this.fecharModalEsqueci();
                 
-                // Em vez de enviar e-mail, vamos direto para a tela de redefinição
                 document.getElementById('redefinirMensagem').innerHTML = `Redefinir senha para <strong>${funcionario.nome}</strong>`;
                 document.getElementById('modalRedefinirSenha').style.display = 'block';
                 
@@ -958,33 +1058,11 @@
             document.getElementById(`tab-${tab}-func`).classList.add('active');
         };
 
-        window.validarSenha = () => {
-            const senha = document.getElementById('primeiroNovaSenha').value;
-            const confirmar = document.getElementById('primeiroConfirmarSenha').value;
-            const btn = document.getElementById('btnCriarSenha');
-
-            const lengthOk = senha.length >= 6;
-            const matchOk = senha === confirmar && senha.length > 0;
-
-            document.getElementById('reqLength').className = `requirement ${lengthOk ? 'met' : ''}`;
-            document.getElementById('reqMatch').className = `requirement ${matchOk ? 'met' : ''}`;
-
-            btn.disabled = !(lengthOk && matchOk);
-        };
-
         window.fazerLoginFuncionario = (e) => {
             e.preventDefault();
             const cpf = document.getElementById('loginCpf').value;
             const senha = document.getElementById('loginSenha').value;
             sistema.fazerLogin(cpf, senha);
-        };
-
-        window.criarPrimeiroAcessoFuncionario = (e) => {
-            e.preventDefault();
-            const cpf = document.getElementById('primeiroCpf').value;
-            const senha = document.getElementById('primeiroNovaSenha').value;
-            const confirmar = document.getElementById('primeiroConfirmarSenha').value;
-            sistema.criarPrimeiroAcesso(cpf, senha, confirmar);
         };
 
         window.registrarPonto = (tipo) => sistema.registrarPonto(tipo);
@@ -999,8 +1077,10 @@
         window.onclick = (e) => {
             const modalEsqueci = document.getElementById('modalEsqueciSenha');
             const modalRedefinir = document.getElementById('modalRedefinirSenha');
+            const modalCartorio = document.getElementById('modalEsqueciSenhaCartorio');
             if (e.target === modalEsqueci) sistema.fecharModalEsqueci();
             if (e.target === modalRedefinir) sistema.fecharModalRedefinir();
+            if (e.target === modalCartorio) fecharModalEsqueciSenhaCartorio();
         };
     </script>
 </body>
