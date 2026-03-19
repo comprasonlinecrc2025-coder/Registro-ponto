@@ -383,8 +383,14 @@
             gap: 20px;
         }
 
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
         @media (max-width: 768px) {
-            .grid-2 {
+            .grid-2, .grid-3 {
                 grid-template-columns: 1fr;
             }
         }
@@ -429,6 +435,7 @@
         .action-buttons {
             display: flex;
             gap: 5px;
+            flex-wrap: wrap;
         }
 
         .btn-sm {
@@ -511,12 +518,6 @@
             color: #c82333;
         }
 
-        .file-preview {
-            max-width: 50px;
-            max-height: 50px;
-            border-radius: 5px;
-        }
-
         .progress-bar {
             width: 100%;
             height: 5px;
@@ -531,6 +532,21 @@
             background: #28a745;
             width: 0%;
             transition: width 0.3s ease;
+        }
+
+        #imagePreview {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        #imagePreview img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 2px solid #667eea;
         }
 
         .alert {
@@ -562,15 +578,22 @@
             height: 100%;
             background: rgba(0,0,0,0.5);
             z-index: 1000;
+            overflow-y: auto;
         }
 
         .modal-content {
             background: white;
-            max-width: 400px;
-            margin: 100px auto;
+            max-width: 800px;
+            margin: 50px auto;
             padding: 30px;
             border-radius: 15px;
-            text-align: center;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #1e3c72;
         }
 
         .modal-buttons {
@@ -578,6 +601,74 @@
             gap: 10px;
             margin-top: 20px;
             justify-content: center;
+        }
+
+        .documento-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .documento-item img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border: 2px solid #667eea;
+        }
+
+        .documento-item iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .documento-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .documento-nome {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .documento-tamanho {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .edit-form {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .edit-form h4 {
+            margin-bottom: 15px;
+            color: #1e3c72;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin: 15px 0;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: normal;
         }
     </style>
 </head>
@@ -783,7 +874,7 @@
             </div>
         </div>
 
-        <!-- FUNCIONÁRIOS -->
+        <!-- FUNCIONÁRIOS - COM EDIÇÃO -->
         <div id="sistema-funcionarios" class="main-content">
             <div class="card">
                 <h2>👥 Cadastro de Funcionários</h2>
@@ -874,17 +965,18 @@
                                 <th>Saída</th>
                                 <th>Horas</th>
                                 <th>Extras</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody id="tabelaRegistros">
-                            <tr><td colspan="10" style="text-align: center;">Nenhum registro</td></tr>
+                            <tr><td colspan="11" style="text-align: center;">Nenhum registro</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- FALTAS -->
+        <!-- FALTAS - COM UPLOAD E VISUALIZAÇÃO DE DOCUMENTOS -->
         <div id="sistema-faltas" class="main-content">
             <div class="card">
                 <h2>❌ Controle de Faltas</h2>
@@ -919,6 +1011,22 @@
                     <div id="areaJustificativa" style="display: none; margin-top: 20px; padding: 20px; background: white; border-radius: 10px; border: 2px dashed #667eea;">
                         <h4 style="margin-bottom: 15px; color: #333;">📎 Documentos de Justificativa</h4>
                         
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Tipo de Documento:</label>
+                                <select id="documentoTipo" class="form-control">
+                                    <option value="atestado">Atestado Médico</option>
+                                    <option value="declaracao">Declaração</option>
+                                    <option value="cid">Atestado com CID</option>
+                                    <option value="outros">Outros</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Número do Documento:</label>
+                                <input type="text" id="documentoNumero" class="form-control" placeholder="Número do documento">
+                            </div>
+                        </div>
+
                         <div style="margin: 20px 0;">
                             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                                 <button type="button" class="btn btn-info" onclick="document.getElementById('fileInput').click()" style="margin: 0;">
@@ -935,6 +1043,10 @@
                             
                             <div id="fileList" style="margin-top: 15px; max-height: 200px; overflow-y: auto;"></div>
                             <div id="imagePreview" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;"></div>
+                        </div>
+
+                        <div class="info-box" style="margin-top: 10px;">
+                            <strong>ℹ️ Formatos aceitos:</strong> PDF, JPG, PNG, DOC (máx 10MB por arquivo)
                         </div>
                     </div>
 
@@ -962,7 +1074,7 @@
             </div>
         </div>
 
-        <!-- FÉRIAS -->
+        <!-- FÉRIAS - COM EDIÇÃO -->
         <div id="sistema-ferias" class="main-content">
             <div class="card">
                 <h2>🏖️ Controle de Férias</h2>
@@ -1006,17 +1118,18 @@
                                 <th>Início</th>
                                 <th>Fim</th>
                                 <th>Dias</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody id="tabelaFerias">
-                            <tr><td colspan="5" style="text-align: center;">Nenhum registro</td></tr>
+                            <tr><td colspan="6" style="text-align: center;">Nenhum registro</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- LICENÇAS -->
+        <!-- LICENÇAS - COM EDIÇÃO -->
         <div id="sistema-licencas" class="main-content">
             <div class="card">
                 <h2>📄 Controle de Licenças</h2>
@@ -1067,31 +1180,34 @@
                             <tr>
                                 <th>Funcionário</th>
                                 <th>Tipo</th>
-                                <th>Período</th>
+                                <th>Início</th>
+                                <th>Fim</th>
                                 <th>Dias</th>
                                 <th>Motivo</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody id="tabelaLicencas">
-                            <tr><td colspan="5" style="text-align: center;">Nenhum registro</td></tr>
+                            <tr><td colspan="7" style="text-align: center;">Nenhum registro</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- RELATÓRIOS - CORRIGIDO -->
+        <!-- RELATÓRIOS - COM OPÇÃO TODOS OS FUNCIONÁRIOS -->
         <div id="sistema-relatorios" class="main-content">
             <div class="card">
-                <h2>📊 Relatórios Completos por Funcionário</h2>
+                <h2>📊 Relatórios Completos</h2>
                 
                 <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 30px;">
-                    <h3>Filtrar Histórico do Funcionário</h3>
+                    <h3>Filtrar Histórico</h3>
                     <div class="grid-2">
                         <div class="form-group">
                             <label>Funcionário:</label>
                             <select id="relatorioFuncionario" class="form-control" onchange="carregarHistoricoFuncionario()">
                                 <option value="">Selecione um funcionário</option>
+                                <option value="todos">📋 TODOS OS FUNCIONÁRIOS</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -1158,6 +1274,7 @@
                         <table>
                             <thead>
                                 <tr>
+                                    <th>Funcionário</th>
                                     <th>Data</th>
                                     <th>Entrada</th>
                                     <th>Saída Almoço</th>
@@ -1168,7 +1285,7 @@
                                 </tr>
                             </thead>
                             <tbody id="tabelaHistoricoPontos">
-                                <tr><td colspan="7" style="text-align: center;">Selecione um funcionário</td></tr>
+                                <tr><td colspan="8" style="text-align: center;">Selecione um funcionário</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1181,6 +1298,7 @@
                         <table>
                             <thead>
                                 <tr>
+                                    <th>Funcionário</th>
                                     <th>Data</th>
                                     <th>Tipo</th>
                                     <th>Motivo</th>
@@ -1188,7 +1306,7 @@
                                 </tr>
                             </thead>
                             <tbody id="tabelaHistoricoFaltas">
-                                <tr><td colspan="4" style="text-align: center;">Nenhuma falta registrada</td></tr>
+                                <tr><td colspan="5" style="text-align: center;">Nenhuma falta registrada</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1201,6 +1319,7 @@
                         <table>
                             <thead>
                                 <tr>
+                                    <th>Funcionário</th>
                                     <th>Período Aquisitivo</th>
                                     <th>Data Início</th>
                                     <th>Data Fim</th>
@@ -1209,7 +1328,7 @@
                                 </tr>
                             </thead>
                             <tbody id="tabelaHistoricoFerias">
-                                <tr><td colspan="5" style="text-align: center;">Nenhum período de férias registrado</td></tr>
+                                <tr><td colspan="6" style="text-align: center;">Nenhum período de férias registrado</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1222,6 +1341,7 @@
                         <table>
                             <thead>
                                 <tr>
+                                    <th>Funcionário</th>
                                     <th>Tipo</th>
                                     <th>Data Início</th>
                                     <th>Data Fim</th>
@@ -1230,7 +1350,7 @@
                                 </tr>
                             </thead>
                             <tbody id="tabelaHistoricoLicencas">
-                                <tr><td colspan="5" style="text-align: center;">Nenhuma licença registrada</td></tr>
+                                <tr><td colspan="6" style="text-align: center;">Nenhuma licença registrada</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1334,9 +1454,21 @@
         </div>
     </div>
 
+    <!-- Modal de Edição -->
+    <div id="modalEditar" class="modal">
+        <div class="modal-content">
+            <h3 id="modalEditarTitulo">Editar Registro</h3>
+            <div id="modalEditarConteudo"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-success" onclick="salvarEdicao()">Salvar</button>
+                <button class="btn btn-danger" onclick="fecharModalEditar()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal para visualizar documentos -->
     <div id="modalVisualizarDocs" class="modal">
-        <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-content">
             <h3>📄 Documentos Anexados</h3>
             <div id="documentosContainer" style="max-height: 400px; overflow-y: auto; margin: 20px 0;"></div>
             <div class="modal-buttons">
@@ -1345,7 +1477,7 @@
         </div>
     </div>
 
-    <div class="footer">Sistema Administrativo v14.0 - Relatórios Corrigidos</div>
+    <div class="footer">Sistema Administrativo v15.0 - Com Edição e Visualização de Documentos</div>
 
     <script>
         // ========== CONFIGURAÇÕES ==========
@@ -1354,6 +1486,8 @@
         let arquivosSelecionados = [];
         let funcionarioHistoricoAtual = null;
         let abaHistoricoAtual = 'pontos';
+        let itemEditando = null;
+        let tipoEditando = null;
 
         // ========== FUNÇÃO CORRIGIDA PARA DATA LOCAL ==========
         function getDataLocalBrasil() {
@@ -1367,6 +1501,16 @@
             const dataFormatada = new Intl.DateTimeFormat('pt-BR', options).format(agora);
             const [dia, mes, ano] = dataFormatada.split('/');
             return `${ano}-${mes}-${dia}`;
+        }
+
+        // ========== FUNÇÃO PARA CONVERTER ARQUIVO PARA BASE64 ==========
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
         }
 
         // ========== CONTROLE DE SESSÃO ==========
@@ -1478,9 +1622,8 @@
             document.getElementById('areaJustificativa').style.display = tipo === 'justificada' ? 'block' : 'none';
         };
 
-        window.handleFileSelect = (event) => {
+        window.handleFileSelect = async (event) => {
             const files = event.target.files;
-            arquivosSelecionados = Array.from(files);
             
             const fileList = document.getElementById('fileList');
             const imagePreview = document.getElementById('imagePreview');
@@ -1489,73 +1632,77 @@
             fileList.innerHTML = '';
             imagePreview.innerHTML = '';
             
-            if (arquivosSelecionados.length === 0) {
+            if (files.length === 0) {
                 arquivoSelecionado.textContent = 'Nenhum arquivo selecionado';
                 return;
             }
             
-            arquivoSelecionado.textContent = `${arquivosSelecionados.length} arquivo(s) selecionado(s)`;
+            arquivoSelecionado.textContent = `${files.length} arquivo(s) selecionado(s)`;
             
             const progressBar = document.getElementById('progressBar');
             const progressFill = document.getElementById('progressFill');
             progressBar.style.display = 'block';
             
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 10;
-                progressFill.style.width = progress + '%';
-                
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    
-                    arquivosSelecionados.forEach((file, index) => {
-                        const fileItem = document.createElement('div');
-                        fileItem.className = 'file-item';
-                        
-                        const fileInfo = document.createElement('div');
-                        fileInfo.className = 'file-info';
-                        
-                        if (file.type.startsWith('image/')) {
-                            fileInfo.innerHTML = `🖼️ ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
-                        } else if (file.type === 'application/pdf') {
-                            fileInfo.innerHTML = `📄 ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
-                        } else {
-                            fileInfo.innerHTML = `📎 ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
-                        }
-                        
-                        const removeBtn = document.createElement('span');
-                        removeBtn.className = 'file-remove';
-                        removeBtn.innerHTML = '❌';
-                        removeBtn.onclick = () => {
-                            arquivosSelecionados.splice(index, 1);
-                            fileItem.remove();
-                            if (arquivosSelecionados.length === 0) {
-                                arquivoSelecionado.textContent = 'Nenhum arquivo selecionado';
-                                progressBar.style.display = 'none';
-                            }
-                        };
-                        
-                        fileItem.appendChild(fileInfo);
-                        fileItem.appendChild(removeBtn);
-                        fileList.appendChild(fileItem);
-                        
-                        if (file.type.startsWith('image/')) {
-                            const reader = new FileReader();
-                            reader.onload = (e) => {
-                                const img = document.createElement('img');
-                                img.src = e.target.result;
-                                img.style.width = '100px';
-                                img.style.height = '100px';
-                                img.style.objectFit = 'cover';
-                                img.style.borderRadius = '5px';
-                                img.style.border = '2px solid #667eea';
-                                imagePreview.appendChild(img);
-                            };
-                            reader.readAsDataURL(file);
-                        }
+            arquivosSelecionados = [];
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                try {
+                    const base64 = await fileToBase64(file);
+                    arquivosSelecionados.push({
+                        nome: file.name,
+                        tipo: file.type,
+                        tamanho: file.size,
+                        base64: base64,
+                        data: new Date().toISOString()
                     });
+                    
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    
+                    const fileInfo = document.createElement('div');
+                    fileInfo.className = 'file-info';
+                    
+                    if (file.type.startsWith('image/')) {
+                        fileInfo.innerHTML = `🖼️ ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                    } else if (file.type === 'application/pdf') {
+                        fileInfo.innerHTML = `📄 ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                    } else {
+                        fileInfo.innerHTML = `📎 ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                    }
+                    
+                    const removeBtn = document.createElement('span');
+                    removeBtn.className = 'file-remove';
+                    removeBtn.innerHTML = '❌';
+                    removeBtn.onclick = () => {
+                        arquivosSelecionados.splice(i, 1);
+                        fileItem.remove();
+                        if (arquivosSelecionados.length === 0) {
+                            arquivoSelecionado.textContent = 'Nenhum arquivo selecionado';
+                            progressBar.style.display = 'none';
+                        }
+                    };
+                    
+                    fileItem.appendChild(fileInfo);
+                    fileItem.appendChild(removeBtn);
+                    fileList.appendChild(fileItem);
+                    
+                    if (file.type.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = base64;
+                        imagePreview.appendChild(img);
+                    }
+                    
+                    progress = ((i + 1) / files.length) * 100;
+                    progressFill.style.width = progress + '%';
+                } catch (error) {
+                    console.error('Erro ao converter arquivo:', error);
                 }
-            }, 100);
+            }
+            
+            setTimeout(() => {
+                progressBar.style.display = 'none';
+            }, 1000);
         };
 
         window.fecharModalDocs = () => {
@@ -1571,29 +1718,229 @@
             
             falta.documentos.forEach(doc => {
                 const div = document.createElement('div');
-                div.style.margin = '10px 0';
-                div.style.padding = '10px';
-                div.style.background = '#f8f9fa';
-                div.style.borderRadius = '5px';
+                div.className = 'documento-item';
+                
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'documento-info';
+                infoDiv.innerHTML = `
+                    <span class="documento-nome">${doc.nome}</span>
+                    <span class="documento-tamanho">${(doc.tamanho / 1024).toFixed(2)} KB</span>
+                `;
+                div.appendChild(infoDiv);
                 
                 if (doc.tipo?.startsWith('image/')) {
-                    div.innerHTML = `
-                        <p><strong>${doc.nome}</strong></p>
-                        <img src="${doc.dataUrl}" style="max-width: 100%; max-height: 200px; border-radius: 5px;">
-                        <p style="font-size: 12px; color: #666;">${(doc.tamanho / 1024).toFixed(2)} KB</p>
-                    `;
+                    const img = document.createElement('img');
+                    img.src = doc.base64 || doc.dataUrl;
+                    div.appendChild(img);
+                } else if (doc.tipo === 'application/pdf') {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = doc.base64 || doc.dataUrl;
+                    div.appendChild(iframe);
                 } else {
-                    div.innerHTML = `
-                        <p><strong>${doc.nome}</strong></p>
-                        <a href="${doc.dataUrl}" target="_blank" class="btn btn-sm btn-info">Abrir Documento</a>
-                        <p style="font-size: 12px; color: #666;">${(doc.tamanho / 1024).toFixed(2)} KB</p>
-                    `;
+                    const link = document.createElement('a');
+                    link.href = doc.base64 || doc.dataUrl;
+                    link.target = '_blank';
+                    link.className = 'btn btn-sm btn-info';
+                    link.textContent = 'Abrir Documento';
+                    div.appendChild(link);
                 }
                 
                 container.appendChild(div);
             });
             
             document.getElementById('modalVisualizarDocs').style.display = 'block';
+        };
+
+        // ========== FUNÇÕES DE EDIÇÃO ==========
+        window.abrirModalEditar = (tipo, item) => {
+            tipoEditando = tipo;
+            itemEditando = item;
+            
+            const modal = document.getElementById('modalEditar');
+            const titulo = document.getElementById('modalEditarTitulo');
+            const conteudo = document.getElementById('modalEditarConteudo');
+            
+            titulo.textContent = `Editar ${tipo}`;
+            
+            let html = '<div class="edit-form">';
+            
+            if (tipo === 'funcionario') {
+                html += `
+                    <h4>Editar Funcionário</h4>
+                    <div class="form-group">
+                        <label>Nome:</label>
+                        <input type="text" id="editNome" class="form-control" value="${item.nome}">
+                    </div>
+                    <div class="form-group">
+                        <label>CPF:</label>
+                        <input type="text" id="editCpf" class="form-control" value="${item.cpf}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Matrícula:</label>
+                        <input type="text" id="editMatricula" class="form-control" value="${item.matricula || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>E-mail:</label>
+                        <input type="email" id="editEmail" class="form-control" value="${item.email || ''}">
+                    </div>
+                `;
+            } else if (tipo === 'ferias') {
+                html += `
+                    <h4>Editar Férias</h4>
+                    <div class="form-group">
+                        <label>Período Aquisitivo:</label>
+                        <input type="text" id="editPeriodo" class="form-control" value="${item.periodo || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>Data Início:</label>
+                        <input type="date" id="editInicio" class="form-control" value="${item.inicio}">
+                    </div>
+                    <div class="form-group">
+                        <label>Data Fim:</label>
+                        <input type="date" id="editFim" class="form-control" value="${item.fim}">
+                    </div>
+                    <div class="form-group">
+                        <label>Dias:</label>
+                        <input type="number" id="editDias" class="form-control" value="${item.dias}">
+                    </div>
+                `;
+            } else if (tipo === 'licenca') {
+                html += `
+                    <h4>Editar Licença</h4>
+                    <div class="form-group">
+                        <label>Tipo:</label>
+                        <select id="editTipo" class="form-control">
+                            <option value="medica" ${item.tipo === 'medica' ? 'selected' : ''}>Licença Médica</option>
+                            <option value="maternidade" ${item.tipo === 'maternidade' ? 'selected' : ''}>Licença Maternidade</option>
+                            <option value="paternidade" ${item.tipo === 'paternidade' ? 'selected' : ''}>Licença Paternidade</option>
+                            <option value="casamento" ${item.tipo === 'casamento' ? 'selected' : ''}>Licença Casamento</option>
+                            <option value="luto" ${item.tipo === 'luto' ? 'selected' : ''}>Licença Luto</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Data Início:</label>
+                        <input type="date" id="editInicio" class="form-control" value="${item.inicio}">
+                    </div>
+                    <div class="form-group">
+                        <label>Data Fim:</label>
+                        <input type="date" id="editFim" class="form-control" value="${item.fim}">
+                    </div>
+                    <div class="form-group">
+                        <label>Dias:</label>
+                        <input type="number" id="editDias" class="form-control" value="${item.dias}">
+                    </div>
+                    <div class="form-group">
+                        <label>Motivo:</label>
+                        <input type="text" id="editMotivo" class="form-control" value="${item.motivo || ''}">
+                    </div>
+                `;
+            } else if (tipo === 'falta') {
+                html += `
+                    <h4>Editar Falta</h4>
+                    <div class="form-group">
+                        <label>Data:</label>
+                        <input type="date" id="editData" class="form-control" value="${item.data}">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo:</label>
+                        <select id="editTipo" class="form-control">
+                            <option value="nao_justificada" ${item.tipo === 'nao_justificada' ? 'selected' : ''}>Não Justificada</option>
+                            <option value="justificada" ${item.tipo === 'justificada' ? 'selected' : ''}>Justificada</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Motivo:</label>
+                        <input type="text" id="editMotivo" class="form-control" value="${item.motivo || ''}">
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            conteudo.innerHTML = html;
+            modal.style.display = 'block';
+        };
+
+        window.fecharModalEditar = () => {
+            document.getElementById('modalEditar').style.display = 'none';
+            itemEditando = null;
+            tipoEditando = null;
+        };
+
+        window.salvarEdicao = () => {
+            if (!itemEditando || !tipoEditando) return;
+            
+            if (tipoEditando === 'funcionario') {
+                const nome = document.getElementById('editNome').value;
+                const matricula = document.getElementById('editMatricula').value;
+                const email = document.getElementById('editEmail').value;
+                
+                if (!nome || !matricula || !email) {
+                    alert('Preencha todos os campos!');
+                    return;
+                }
+                
+                if (!validarEmail(email)) {
+                    alert('E-mail inválido!');
+                    return;
+                }
+                
+                itemEditando.nome = nome;
+                itemEditando.matricula = matricula;
+                itemEditando.email = email;
+                
+            } else if (tipoEditando === 'ferias') {
+                const periodo = document.getElementById('editPeriodo').value;
+                const inicio = document.getElementById('editInicio').value;
+                const fim = document.getElementById('editFim').value;
+                const dias = document.getElementById('editDias').value;
+                
+                if (!inicio || !fim) {
+                    alert('Preencha as datas!');
+                    return;
+                }
+                
+                itemEditando.periodo = periodo;
+                itemEditando.inicio = inicio;
+                itemEditando.fim = fim;
+                itemEditando.dias = dias;
+                
+            } else if (tipoEditando === 'licenca') {
+                const tipo = document.getElementById('editTipo').value;
+                const inicio = document.getElementById('editInicio').value;
+                const fim = document.getElementById('editFim').value;
+                const dias = document.getElementById('editDias').value;
+                const motivo = document.getElementById('editMotivo').value;
+                
+                if (!inicio || !fim) {
+                    alert('Preencha as datas!');
+                    return;
+                }
+                
+                itemEditando.tipo = tipo;
+                itemEditando.inicio = inicio;
+                itemEditando.fim = fim;
+                itemEditando.dias = dias;
+                itemEditando.motivo = motivo;
+                
+            } else if (tipoEditando === 'falta') {
+                const data = document.getElementById('editData').value;
+                const tipo = document.getElementById('editTipo').value;
+                const motivo = document.getElementById('editMotivo').value;
+                
+                if (!data) {
+                    alert('Preencha a data!');
+                    return;
+                }
+                
+                itemEditando.data = data;
+                itemEditando.tipo = tipo;
+                itemEditando.motivo = motivo;
+            }
+            
+            sistema.salvarDados();
+            sistema.atualizarTodasTelas();
+            fecharModalEditar();
+            sistema.mostrarAlerta('Registro atualizado com sucesso!', 'success');
         };
 
         // ==================== SISTEMA COMPLETO ====================
@@ -1767,6 +2114,9 @@
                     const select = document.getElementById(id);
                     if (select) {
                         select.innerHTML = '<option value="">Selecione</option>';
+                        if (id === 'relatorioFuncionario') {
+                            select.innerHTML += '<option value="todos">📋 TODOS OS FUNCIONÁRIOS</option>';
+                        }
                         this.funcionarios.filter(f => f.ativo !== false).forEach(func => {
                             select.innerHTML += `<option value="${func.cpf}">${func.matricula || ''} - ${func.nome}</option>`;
                         });
@@ -1981,10 +2331,13 @@
                                     <button class="btn btn-info btn-sm" onclick="abrirModalRecuperar('${f.cpf}', '${f.nome}')">
                                         🔑 Reset Senha
                                     </button>
-                                    <button class="btn btn-warning btn-sm" onclick="toggleFuncionarioStatus('${f.cpf}')">
+                                    <button class="btn btn-warning btn-sm" onclick="sistema.toggleFuncionarioStatus('${f.cpf}')">
                                         ${f.ativo !== false ? 'Desativar' : 'Ativar'}
                                     </button>
-                                    <button class="btn btn-danger btn-sm" onclick="confirmarExcluirFuncionario('${f.cpf}', '${f.nome}')">
+                                    <button class="btn btn-primary btn-sm" onclick="abrirModalEditar('funcionario', ${JSON.stringify(f).replace(/"/g, '&quot;')})">
+                                        ✏️ Editar
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="sistema.confirmarExcluirFuncionario('${f.cpf}', '${f.nome}')">
                                         Excluir
                                     </button>
                                 </div>
@@ -2008,7 +2361,7 @@
                 filtrados.sort((a, b) => b.data.localeCompare(a.data));
 
                 if (filtrados.length === 0) {
-                    document.getElementById('tabelaRegistros').innerHTML = '<tr><td colspan="10">Nenhum registro</td></tr>';
+                    document.getElementById('tabelaRegistros').innerHTML = '<tr><td colspan="11">Nenhum registro</td></tr>';
                     return;
                 }
 
@@ -2060,6 +2413,11 @@
                             <td>${r.saida || '--'}</td>
                             <td>${horasTrab}</td>
                             <td>${horasExtras}</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm" onclick="abrirModalEditar('registro', ${JSON.stringify(r).replace(/"/g, '&quot;')})">
+                                    ✏️ Editar
+                                </button>
+                            </td>
                         </tr>
                     `;
                 }).join('');
@@ -2095,10 +2453,15 @@
                                 }
                             </td>
                             <td>
-                                ${numDocs > 0 ? 
-                                    `<button class="btn btn-info btn-sm" onclick="visualizarDocumentos(${f.id})">📎 Ver Docs</button>` : 
-                                    '--'
-                                }
+                                <div class="action-buttons">
+                                    ${numDocs > 0 ? 
+                                        `<button class="btn btn-info btn-sm" onclick="visualizarDocumentos(${f.id})">📎 Ver Docs</button>` : 
+                                        ''
+                                    }
+                                    <button class="btn btn-primary btn-sm" onclick="abrirModalEditar('falta', ${JSON.stringify(f).replace(/"/g, '&quot;')})">
+                                        ✏️ Editar
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     `;
@@ -2108,7 +2471,7 @@
             atualizarTabelaFerias() {
                 if (this.ferias.length === 0) {
                     document.getElementById('tabelaFerias').innerHTML = 
-                        '<tr><td colspan="5" style="text-align: center;">Nenhum registro</td></tr>';
+                        '<tr><td colspan="6" style="text-align: center;">Nenhum registro</td></tr>';
                     return;
                 }
                 
@@ -2122,6 +2485,11 @@
                             <td>${f.inicio.split('-').reverse().join('/')}</td>
                             <td>${f.fim.split('-').reverse().join('/')}</td>
                             <td>${f.dias}</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm" onclick="abrirModalEditar('ferias', ${JSON.stringify(f).replace(/"/g, '&quot;')})">
+                                    ✏️ Editar
+                                </button>
+                            </td>
                         </tr>
                     `;
                 }).join('');
@@ -2130,7 +2498,7 @@
             atualizarTabelaLicencas() {
                 if (this.licencas.length === 0) {
                     document.getElementById('tabelaLicencas').innerHTML = 
-                        '<tr><td colspan="5" style="text-align: center;">Nenhum registro</td></tr>';
+                        '<tr><td colspan="7" style="text-align: center;">Nenhum registro</td></tr>';
                     return;
                 }
                 
@@ -2141,9 +2509,15 @@
                         <tr>
                             <td>${funcionario?.nome || l.funcionarioCpf}</td>
                             <td>${l.tipo}</td>
-                            <td>${l.inicio.split('-').reverse().join('/')} - ${l.fim.split('-').reverse().join('/')}</td>
+                            <td>${l.inicio.split('-').reverse().join('/')}</td>
+                            <td>${l.fim.split('-').reverse().join('/')}</td>
                             <td>${l.dias}</td>
                             <td>${l.motivo || '--'}</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm" onclick="abrirModalEditar('licenca', ${JSON.stringify(l).replace(/"/g, '&quot;')})">
+                                    ✏️ Editar
+                                </button>
+                            </td>
                         </tr>
                     `;
                 }).join('');
@@ -2170,22 +2544,39 @@
                 `).join('');
             }
 
-            // ========== FUNÇÕES DO RELATÓRIO CORRIGIDAS ==========
+            // ========== FUNÇÕES DO RELATÓRIO ==========
             carregarHistoricoFuncionario() {
-                const cpf = document.getElementById('relatorioFuncionario').value;
+                const selecao = document.getElementById('relatorioFuncionario').value;
                 const periodo = document.getElementById('relatorioPeriodo').value;
                 
-                if (!cpf) {
+                if (!selecao) {
                     document.getElementById('infoFuncionarioRelatorio').style.display = 'none';
                     document.getElementById('statsRelatorio').style.display = 'none';
-                    document.getElementById('tabelaHistoricoPontos').innerHTML = '<tr><td colspan="7" style="text-align: center;">Selecione um funcionário</td></tr>';
-                    document.getElementById('tabelaHistoricoFaltas').innerHTML = '<tr><td colspan="4" style="text-align: center;">Selecione um funcionário</td></tr>';
-                    document.getElementById('tabelaHistoricoFerias').innerHTML = '<tr><td colspan="5" style="text-align: center;">Selecione um funcionário</td></tr>';
-                    document.getElementById('tabelaHistoricoLicencas').innerHTML = '<tr><td colspan="5" style="text-align: center;">Selecione um funcionário</td></tr>';
+                    document.getElementById('tabelaHistoricoPontos').innerHTML = '<tr><td colspan="8" style="text-align: center;">Selecione um funcionário</td></tr>';
+                    document.getElementById('tabelaHistoricoFaltas').innerHTML = '<tr><td colspan="5" style="text-align: center;">Selecione um funcionário</td></tr>';
+                    document.getElementById('tabelaHistoricoFerias').innerHTML = '<tr><td colspan="6" style="text-align: center;">Selecione um funcionário</td></tr>';
+                    document.getElementById('tabelaHistoricoLicencas').innerHTML = '<tr><td colspan="6" style="text-align: center;">Selecione um funcionário</td></tr>';
                     return;
                 }
                 
-                const funcionario = this.funcionarios.find(f => f.cpf === cpf);
+                if (selecao === 'todos') {
+                    // Modo "Todos os funcionários"
+                    document.getElementById('infoFuncionarioRelatorio').style.display = 'block';
+                    document.getElementById('relatorioNomeFuncionario').textContent = 'TODOS OS FUNCIONÁRIOS';
+                    document.getElementById('relatorioMatriculaCPF').textContent = `Total: ${this.funcionarios.length} funcionários ativos`;
+                    
+                    this.carregarHistoricoPontosTodos(periodo);
+                    this.carregarHistoricoFaltasTodos(periodo);
+                    this.carregarHistoricoFeriasTodos(periodo);
+                    this.carregarHistoricoLicencasTodos(periodo);
+                    
+                    this.calcularEstatisticasTodos(periodo);
+                    
+                    document.getElementById('statsRelatorio').style.display = 'block';
+                    return;
+                }
+                
+                const funcionario = this.funcionarios.find(f => f.cpf === selecao);
                 if (!funcionario) return;
                 
                 funcionarioHistoricoAtual = funcionario;
@@ -2194,12 +2585,12 @@
                 document.getElementById('relatorioNomeFuncionario').textContent = funcionario.nome;
                 document.getElementById('relatorioMatriculaCPF').textContent = `Matrícula: ${funcionario.matricula || '---'} | CPF: ${funcionario.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}`;
                 
-                this.carregarHistoricoPontos(cpf, periodo);
-                this.carregarHistoricoFaltas(cpf, periodo);
-                this.carregarHistoricoFerias(cpf, periodo);
-                this.carregarHistoricoLicencas(cpf, periodo);
+                this.carregarHistoricoPontos(selecao, periodo);
+                this.carregarHistoricoFaltas(selecao, periodo);
+                this.carregarHistoricoFerias(selecao, periodo);
+                this.carregarHistoricoLicencas(selecao, periodo);
                 
-                this.calcularEstatisticasFuncionario(cpf, periodo);
+                this.calcularEstatisticasFuncionario(selecao, periodo);
                 
                 document.getElementById('statsRelatorio').style.display = 'block';
             }
@@ -2266,6 +2657,66 @@
                 document.getElementById('statsFaltas').textContent = faltasFunc.length;
             }
 
+            calcularEstatisticasTodos(periodo) {
+                let dataLimite = null;
+                if (periodo !== 'tudo') {
+                    dataLimite = new Date();
+                    dataLimite.setDate(dataLimite.getDate() - parseInt(periodo));
+                }
+                
+                const registrosFunc = this.registros.filter(r => {
+                    if (dataLimite) {
+                        const [ano, mes, dia] = r.data.split('-');
+                        const dataReg = new Date(ano, mes-1, dia);
+                        return dataReg >= dataLimite;
+                    }
+                    return true;
+                });
+                
+                const faltasFunc = this.faltas.filter(f => {
+                    if (dataLimite) {
+                        const [ano, mes, dia] = f.data.split('-');
+                        const dataFalta = new Date(ano, mes-1, dia);
+                        return dataFalta >= dataLimite;
+                    }
+                    return true;
+                });
+                
+                const diasTrabalhados = registrosFunc.filter(r => r.entrada).length;
+                
+                let totalMinutos = 0;
+                let totalExtras = 0;
+                
+                registrosFunc.forEach(r => {
+                    if (r.entrada && r.saida) {
+                        const entrada = r.entrada.split(':').map(Number);
+                        const saida = r.saida.split(':').map(Number);
+                        
+                        let minutos = (saida[0] * 60 + saida[1]) - (entrada[0] * 60 + entrada[1]);
+                        
+                        if (r.almoco && r.voltaAlmoco) {
+                            const almoco = r.almoco.split(':').map(Number);
+                            const volta = r.voltaAlmoco.split(':').map(Number);
+                            const minutosAlmoco = (volta[0] * 60 + volta[1]) - (almoco[0] * 60 + almoco[1]);
+                            minutos -= minutosAlmoco;
+                        }
+                        
+                        totalMinutos += minutos;
+                        
+                        const saidaMin = saida[0] * 60 + saida[1];
+                        const limiteMin = 17 * 60 + 45;
+                        if (saidaMin > limiteMin) {
+                            totalExtras += saidaMin - limiteMin;
+                        }
+                    }
+                });
+                
+                document.getElementById('statsTotalDias').textContent = diasTrabalhados;
+                document.getElementById('statsHoras').textContent = Math.floor(totalMinutos / 60) + 'h ' + (totalMinutos % 60) + 'min';
+                document.getElementById('statsExtras').textContent = Math.floor(totalExtras / 60) + 'h ' + (totalExtras % 60) + 'min';
+                document.getElementById('statsFaltas').textContent = faltasFunc.length;
+            }
+
             carregarHistoricoPontos(cpf, periodo) {
                 let dataLimite = null;
                 if (periodo !== 'tudo') {
@@ -2286,12 +2737,13 @@
                 registros.sort((a, b) => b.data.localeCompare(a.data));
                 
                 if (registros.length === 0) {
-                    document.getElementById('tabelaHistoricoPontos').innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhum registro encontrado</td></tr>';
+                    document.getElementById('tabelaHistoricoPontos').innerHTML = '<tr><td colspan="8" style="text-align: center;">Nenhum registro encontrado</td></tr>';
                     return;
                 }
                 
                 const tbody = document.getElementById('tabelaHistoricoPontos');
                 tbody.innerHTML = registros.map(r => {
+                    const funcionario = this.funcionarios.find(f => f.cpf === r.funcionarioCpf);
                     let horasTrab = '--';
                     let horasExtras = '--';
                     
@@ -2322,6 +2774,76 @@
                     
                     return `
                         <tr>
+                            <td>${funcionario?.nome || r.funcionarioNome}</td>
+                            <td>${dataExibicao}</td>
+                            <td>${r.entrada || '--'}</td>
+                            <td>${r.almoco || '--'}</td>
+                            <td>${r.voltaAlmoco || '--'}</td>
+                            <td>${r.saida || '--'}</td>
+                            <td>${horasTrab}</td>
+                            <td>${horasExtras}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            carregarHistoricoPontosTodos(periodo) {
+                let dataLimite = null;
+                if (periodo !== 'tudo') {
+                    dataLimite = new Date();
+                    dataLimite.setDate(dataLimite.getDate() - parseInt(periodo));
+                }
+                
+                let registros = this.registros.filter(r => {
+                    if (dataLimite) {
+                        const [ano, mes, dia] = r.data.split('-');
+                        const dataReg = new Date(ano, mes-1, dia);
+                        return dataReg >= dataLimite;
+                    }
+                    return true;
+                });
+                
+                registros.sort((a, b) => b.data.localeCompare(a.data));
+                
+                if (registros.length === 0) {
+                    document.getElementById('tabelaHistoricoPontos').innerHTML = '<tr><td colspan="8" style="text-align: center;">Nenhum registro encontrado</td></tr>';
+                    return;
+                }
+                
+                const tbody = document.getElementById('tabelaHistoricoPontos');
+                tbody.innerHTML = registros.map(r => {
+                    const funcionario = this.funcionarios.find(f => f.cpf === r.funcionarioCpf);
+                    let horasTrab = '--';
+                    let horasExtras = '--';
+                    
+                    if (r.entrada && r.saida) {
+                        const entrada = r.entrada.split(':').map(Number);
+                        const saida = r.saida.split(':').map(Number);
+                        
+                        let minutos = (saida[0] * 60 + saida[1]) - (entrada[0] * 60 + entrada[1]);
+                        
+                        if (r.almoco && r.voltaAlmoco) {
+                            const almoco = r.almoco.split(':').map(Number);
+                            const volta = r.voltaAlmoco.split(':').map(Number);
+                            const minutosAlmoco = (volta[0] * 60 + volta[1]) - (almoco[0] * 60 + almoco[1]);
+                            minutos -= minutosAlmoco;
+                        }
+                        
+                        horasTrab = Math.floor(minutos / 60) + 'h ' + (minutos % 60) + 'min';
+                        
+                        const saidaMin = saida[0] * 60 + saida[1];
+                        const limiteMin = 17 * 60 + 45;
+                        if (saidaMin > limiteMin) {
+                            const extras = saidaMin - limiteMin;
+                            horasExtras = Math.floor(extras / 60) + 'h ' + (extras % 60) + 'min';
+                        }
+                    }
+                    
+                    const dataExibicao = r.data.split('-').reverse().join('/');
+                    
+                    return `
+                        <tr>
+                            <td>${funcionario?.nome || r.funcionarioNome}</td>
                             <td>${dataExibicao}</td>
                             <td>${r.entrada || '--'}</td>
                             <td>${r.almoco || '--'}</td>
@@ -2354,15 +2876,60 @@
                 faltas.sort((a, b) => b.data.localeCompare(a.data));
                 
                 if (faltas.length === 0) {
-                    document.getElementById('tabelaHistoricoFaltas').innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhuma falta registrada</td></tr>';
+                    document.getElementById('tabelaHistoricoFaltas').innerHTML = '<tr><td colspan="5" style="text-align: center;">Nenhuma falta registrada</td></tr>';
                     return;
                 }
                 
                 const tbody = document.getElementById('tabelaHistoricoFaltas');
                 tbody.innerHTML = faltas.map(f => {
+                    const funcionario = this.funcionarios.find(func => func.cpf === f.funcionarioCpf);
                     const dataExibicao = f.data.split('-').reverse().join('/');
                     return `
                         <tr>
+                            <td>${funcionario?.nome || f.funcionarioCpf}</td>
+                            <td>${dataExibicao}</td>
+                            <td>
+                                <span class="badge ${f.tipo === 'justificada' ? 'badge-success' : 'badge-danger'}">
+                                    ${f.tipo === 'justificada' ? 'Justificada' : 'Não Justificada'}
+                                </span>
+                            </td>
+                            <td>${f.motivo || '--'}</td>
+                            <td>${f.documentos?.length ? `${f.documentos.length} arquivo(s)` : '--'}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            carregarHistoricoFaltasTodos(periodo) {
+                let dataLimite = null;
+                if (periodo !== 'tudo') {
+                    dataLimite = new Date();
+                    dataLimite.setDate(dataLimite.getDate() - parseInt(periodo));
+                }
+                
+                let faltas = this.faltas.filter(f => {
+                    if (dataLimite) {
+                        const [ano, mes, dia] = f.data.split('-');
+                        const dataFalta = new Date(ano, mes-1, dia);
+                        return dataFalta >= dataLimite;
+                    }
+                    return true;
+                });
+                
+                faltas.sort((a, b) => b.data.localeCompare(a.data));
+                
+                if (faltas.length === 0) {
+                    document.getElementById('tabelaHistoricoFaltas').innerHTML = '<tr><td colspan="5" style="text-align: center;">Nenhuma falta registrada</td></tr>';
+                    return;
+                }
+                
+                const tbody = document.getElementById('tabelaHistoricoFaltas');
+                tbody.innerHTML = faltas.map(f => {
+                    const funcionario = this.funcionarios.find(func => func.cpf === f.funcionarioCpf);
+                    const dataExibicao = f.data.split('-').reverse().join('/');
+                    return `
+                        <tr>
+                            <td>${funcionario?.nome || f.funcionarioCpf}</td>
                             <td>${dataExibicao}</td>
                             <td>
                                 <span class="badge ${f.tipo === 'justificada' ? 'badge-success' : 'badge-danger'}">
@@ -2380,7 +2947,7 @@
                 let ferias = this.ferias.filter(f => f.funcionarioCpf === cpf);
                 
                 if (ferias.length === 0) {
-                    document.getElementById('tabelaHistoricoFerias').innerHTML = '<tr><td colspan="5" style="text-align: center;">Nenhum período de férias registrado</td></tr>';
+                    document.getElementById('tabelaHistoricoFerias').innerHTML = '<tr><td colspan="6" style="text-align: center;">Nenhum período de férias registrado</td></tr>';
                     return;
                 }
                 
@@ -2390,11 +2957,44 @@
                 
                 const tbody = document.getElementById('tabelaHistoricoFerias');
                 tbody.innerHTML = ferias.map(f => {
+                    const funcionario = this.funcionarios.find(func => func.cpf === f.funcionarioCpf);
                     const status = f.inicio <= hoje && f.fim >= hoje ? 'Em andamento' : 'Concluída';
                     const dataInicio = f.inicio.split('-').reverse().join('/');
                     const dataFim = f.fim.split('-').reverse().join('/');
                     return `
                         <tr>
+                            <td>${funcionario?.nome || f.funcionarioCpf}</td>
+                            <td>${f.periodo || '--'}</td>
+                            <td>${dataInicio}</td>
+                            <td>${dataFim}</td>
+                            <td>${f.dias}</td>
+                            <td><span class="badge badge-info">${status}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            carregarHistoricoFeriasTodos(periodo) {
+                let ferias = this.ferias;
+                
+                if (ferias.length === 0) {
+                    document.getElementById('tabelaHistoricoFerias').innerHTML = '<tr><td colspan="6" style="text-align: center;">Nenhum período de férias registrado</td></tr>';
+                    return;
+                }
+                
+                ferias.sort((a, b) => b.inicio.localeCompare(a.inicio));
+                
+                const hoje = getDataLocalBrasil();
+                
+                const tbody = document.getElementById('tabelaHistoricoFerias');
+                tbody.innerHTML = ferias.map(f => {
+                    const funcionario = this.funcionarios.find(func => func.cpf === f.funcionarioCpf);
+                    const status = f.inicio <= hoje && f.fim >= hoje ? 'Em andamento' : 'Concluída';
+                    const dataInicio = f.inicio.split('-').reverse().join('/');
+                    const dataFim = f.fim.split('-').reverse().join('/');
+                    return `
+                        <tr>
+                            <td>${funcionario?.nome || f.funcionarioCpf}</td>
                             <td>${f.periodo || '--'}</td>
                             <td>${dataInicio}</td>
                             <td>${dataFim}</td>
@@ -2409,7 +3009,7 @@
                 let licencas = this.licencas.filter(l => l.funcionarioCpf === cpf);
                 
                 if (licencas.length === 0) {
-                    document.getElementById('tabelaHistoricoLicencas').innerHTML = '<tr><td colspan="5" style="text-align: center;">Nenhuma licença registrada</td></tr>';
+                    document.getElementById('tabelaHistoricoLicencas').innerHTML = '<tr><td colspan="6" style="text-align: center;">Nenhuma licença registrada</td></tr>';
                     return;
                 }
                 
@@ -2417,10 +3017,40 @@
                 
                 const tbody = document.getElementById('tabelaHistoricoLicencas');
                 tbody.innerHTML = licencas.map(l => {
+                    const funcionario = this.funcionarios.find(func => func.cpf === l.funcionarioCpf);
                     const dataInicio = l.inicio.split('-').reverse().join('/');
                     const dataFim = l.fim.split('-').reverse().join('/');
                     return `
                         <tr>
+                            <td>${funcionario?.nome || l.funcionarioCpf}</td>
+                            <td>${l.tipo}</td>
+                            <td>${dataInicio}</td>
+                            <td>${dataFim}</td>
+                            <td>${l.dias}</td>
+                            <td>${l.motivo || '--'}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            carregarHistoricoLicencasTodos(periodo) {
+                let licencas = this.licencas;
+                
+                if (licencas.length === 0) {
+                    document.getElementById('tabelaHistoricoLicencas').innerHTML = '<tr><td colspan="6" style="text-align: center;">Nenhuma licença registrada</td></tr>';
+                    return;
+                }
+                
+                licencas.sort((a, b) => b.inicio.localeCompare(a.inicio));
+                
+                const tbody = document.getElementById('tabelaHistoricoLicencas');
+                tbody.innerHTML = licencas.map(l => {
+                    const funcionario = this.funcionarios.find(func => func.cpf === l.funcionarioCpf);
+                    const dataInicio = l.inicio.split('-').reverse().join('/');
+                    const dataFim = l.fim.split('-').reverse().join('/');
+                    return `
+                        <tr>
+                            <td>${funcionario?.nome || l.funcionarioCpf}</td>
                             <td>${l.tipo}</td>
                             <td>${dataInicio}</td>
                             <td>${dataFim}</td>
@@ -2432,135 +3062,32 @@
             }
 
             gerarRelatorioPDF() {
-                if (!funcionarioHistoricoAtual) {
-                    this.mostrarAlerta('Selecione um funcionário!', 'warning');
-                    return;
-                }
-                
-                const cpf = funcionarioHistoricoAtual.cpf;
+                const selecao = document.getElementById('relatorioFuncionario').value;
                 const periodo = document.getElementById('relatorioPeriodo').value;
                 const periodoTexto = periodo === 'tudo' ? 'Todo período' : `Últimos ${periodo} dias`;
                 
-                let dataLimite = null;
-                if (periodo !== 'tudo') {
-                    dataLimite = new Date();
-                    dataLimite.setDate(dataLimite.getDate() - parseInt(periodo));
+                if (!selecao) {
+                    this.mostrarAlerta('Selecione um funcionário!', 'warning');
+                    return;
                 }
-                
-                const registros = this.registros.filter(r => {
-                    if (r.funcionarioCpf !== cpf) return false;
-                    if (dataLimite) {
-                        const [ano, mes, dia] = r.data.split('-');
-                        const dataReg = new Date(ano, mes-1, dia);
-                        return dataReg >= dataLimite;
-                    }
-                    return true;
-                }).sort((a, b) => b.data.localeCompare(a.data));
-                
-                const faltas = this.faltas.filter(f => {
-                    if (f.funcionarioCpf !== cpf) return false;
-                    if (dataLimite) {
-                        const [ano, mes, dia] = f.data.split('-');
-                        const dataFalta = new Date(ano, mes-1, dia);
-                        return dataFalta >= dataLimite;
-                    }
-                    return true;
-                });
-                
-                const ferias = this.ferias.filter(f => f.funcionarioCpf === cpf);
-                const licencas = this.licencas.filter(l => l.funcionarioCpf === cpf);
                 
                 let html = `
                     <!DOCTYPE html>
                     <html lang="pt-BR">
                     <head>
                         <meta charset="UTF-8">
-                        <title>Relatório Completo - ${funcionarioHistoricoAtual.nome}</title>
+                        <title>Relatório Completo</title>
                         <style>
-                            body {
-                                font-family: Arial, sans-serif;
-                                margin: 30px;
-                                font-size: 12px;
-                            }
-                            .header {
-                                text-align: center;
-                                margin-bottom: 30px;
-                                padding: 20px;
-                                background: #1e3c72;
-                                color: white;
-                            }
-                            .header h1 {
-                                margin: 0;
-                                font-size: 24px;
-                            }
-                            .header p {
-                                margin: 5px 0 0;
-                                opacity: 0.9;
-                            }
-                            .info-funcionario {
-                                background: #f0f0f0;
-                                padding: 15px;
-                                margin-bottom: 20px;
-                                border-left: 4px solid #1e3c72;
-                            }
-                            .info-funcionario h2 {
-                                margin: 0 0 10px 0;
-                                color: #1e3c72;
-                            }
-                            .stats {
-                                display: grid;
-                                grid-template-columns: repeat(4, 1fr);
-                                gap: 15px;
-                                margin-bottom: 30px;
-                            }
-                            .stat-card {
-                                background: linear-gradient(135deg, #667eea, #764ba2);
-                                color: white;
-                                padding: 15px;
-                                border-radius: 8px;
-                                text-align: center;
-                            }
-                            .stat-card h3 {
-                                margin: 0 0 5px 0;
-                                font-size: 14px;
-                                opacity: 0.9;
-                            }
-                            .stat-card .value {
-                                font-size: 20px;
-                                font-weight: bold;
-                            }
-                            table {
-                                width: 100%;
-                                border-collapse: collapse;
-                                margin: 20px 0;
-                            }
-                            th {
-                                background: #1e3c72;
-                                color: white;
-                                padding: 8px;
-                                text-align: left;
-                                font-size: 11px;
-                            }
-                            td {
-                                padding: 6px;
-                                border: 1px solid #ddd;
-                            }
-                            .section-title {
-                                margin: 30px 0 15px 0;
-                                padding-bottom: 5px;
-                                border-bottom: 2px solid #1e3c72;
-                                font-size: 18px;
-                            }
-                            .footer {
-                                margin-top: 50px;
-                                text-align: center;
-                                color: #666;
-                                font-size: 10px;
-                            }
-                            @media print {
-                                .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                                th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                            }
+                            body { font-family: Arial, sans-serif; margin: 30px; font-size: 12px; }
+                            .header { text-align: center; margin-bottom: 30px; padding: 20px; background: #1e3c72; color: white; }
+                            .info-funcionario { background: #f0f0f0; padding: 15px; margin-bottom: 20px; border-left: 4px solid #1e3c72; }
+                            .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
+                            .stat-card { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 15px; border-radius: 8px; text-align: center; }
+                            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                            th { background: #1e3c72; color: white; padding: 8px; text-align: left; }
+                            td { padding: 6px; border: 1px solid #ddd; }
+                            .section-title { margin: 30px 0 15px 0; padding-bottom: 5px; border-bottom: 2px solid #1e3c72; }
+                            .footer { margin-top: 50px; text-align: center; color: #666; }
                         </style>
                     </head>
                     <body>
@@ -2568,168 +3095,60 @@
                             <h1>Oficial de Registro Civil</h1>
                             <p>Mogi das Cruzes - CNPJ: 51.374.270/0001-01</p>
                         </div>
-                        
+                `;
+                
+                if (selecao === 'todos') {
+                    html += `
                         <div class="info-funcionario">
-                            <h2>${funcionarioHistoricoAtual.nome}</h2>
-                            <p><strong>Matrícula:</strong> ${funcionarioHistoricoAtual.matricula || '---'} | <strong>CPF:</strong> ${funcionarioHistoricoAtual.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}</p>
+                            <h2>TODOS OS FUNCIONÁRIOS</h2>
+                            <p><strong>Total:</strong> ${this.funcionarios.length} funcionários ativos</p>
                             <p><strong>Período:</strong> ${periodoTexto}</p>
                         </div>
                         
                         <div class="stats">
                             <div class="stat-card">
-                                <h3>Dias Trabalhados</h3>
-                                <div class="value">${registros.filter(r => r.entrada).length}</div>
+                                <h3>Total Registros</h3>
+                                <div class="value">${this.registros.length}</div>
                             </div>
                             <div class="stat-card">
-                                <h3>Faltas</h3>
-                                <div class="value">${faltas.length}</div>
+                                <h3>Total Faltas</h3>
+                                <div class="value">${this.faltas.length}</div>
                             </div>
                             <div class="stat-card">
-                                <h3>Férias</h3>
-                                <div class="value">${ferias.length}</div>
+                                <h3>Total Férias</h3>
+                                <div class="value">${this.ferias.length}</div>
                             </div>
                             <div class="stat-card">
-                                <h3>Licenças</h3>
-                                <div class="value">${licencas.length}</div>
+                                <h3>Total Licenças</h3>
+                                <div class="value">${this.licencas.length}</div>
                             </div>
                         </div>
-                        
-                        <div class="section-title">📋 Registros de Ponto</div>
-                        ${registros.length === 0 ? '<p>Nenhum registro encontrado.</p>' : `
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Data</th>
-                                        <th>Entrada</th>
-                                        <th>Saída Almoço</th>
-                                        <th>Volta Almoço</th>
-                                        <th>Saída</th>
-                                        <th>Horas</th>
-                                        <th>Extras</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${registros.map(r => {
-                                        let horas = '--', extras = '--';
-                                        if (r.entrada && r.saida) {
-                                            const entrada = r.entrada.split(':').map(Number);
-                                            const saida = r.saida.split(':').map(Number);
-                                            
-                                            let minutos = (saida[0] * 60 + saida[1]) - (entrada[0] * 60 + entrada[1]);
-                                            
-                                            if (r.almoco && r.voltaAlmoco) {
-                                                const almoco = r.almoco.split(':').map(Number);
-                                                const volta = r.voltaAlmoco.split(':').map(Number);
-                                                minutos -= (volta[0] * 60 + volta[1]) - (almoco[0] * 60 + almoco[1]);
-                                            }
-                                            
-                                            horas = Math.floor(minutos / 60) + 'h ' + (minutos % 60) + 'min';
-                                            
-                                            const saidaMin = saida[0] * 60 + saida[1];
-                                            if (saidaMin > 17 * 60 + 45) {
-                                                extras = Math.floor((saidaMin - (17 * 60 + 45)) / 60) + 'h';
-                                            }
-                                        }
-                                        const dataExibicao = r.data.split('-').reverse().join('/');
-                                        return `
-                                            <tr>
-                                                <td>${dataExibicao}</td>
-                                                <td>${r.entrada || '--'}</td>
-                                                <td>${r.almoco || '--'}</td>
-                                                <td>${r.voltaAlmoco || '--'}</td>
-                                                <td>${r.saida || '--'}</td>
-                                                <td>${horas}</td>
-                                                <td>${extras}</td>
-                                            </tr>
-                                        `;
-                                    }).join('')}
-                                </tbody>
-                            </table>
-                        `}
-                        
-                        <div class="section-title">❌ Faltas</div>
-                        ${faltas.length === 0 ? '<p>Nenhuma falta registrada.</p>' : `
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Data</th>
-                                        <th>Tipo</th>
-                                        <th>Motivo</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${faltas.map(f => {
-                                        const dataExibicao = f.data.split('-').reverse().join('/');
-                                        return `
-                                            <tr>
-                                                <td>${dataExibicao}</td>
-                                                <td>${f.tipo === 'justificada' ? 'Justificada' : 'Não Justificada'}</td>
-                                                <td>${f.motivo || '--'}</td>
-                                            </tr>
-                                        `;
-                                    }).join('')}
-                                </tbody>
-                            </table>
-                        `}
-                        
-                        <div class="section-title">🏖️ Férias</div>
-                        ${ferias.length === 0 ? '<p>Nenhum período de férias registrado.</p>' : `
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Período</th>
-                                        <th>Início</th>
-                                        <th>Fim</th>
-                                        <th>Dias</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${ferias.map(f => {
-                                        const dataInicio = f.inicio.split('-').reverse().join('/');
-                                        const dataFim = f.fim.split('-').reverse().join('/');
-                                        return `
-                                            <tr>
-                                                <td>${f.periodo || '--'}</td>
-                                                <td>${dataInicio}</td>
-                                                <td>${dataFim}</td>
-                                                <td>${f.dias}</td>
-                                            </tr>
-                                        `;
-                                    }).join('')}
-                                </tbody>
-                            </table>
-                        `}
-                        
-                        <div class="section-title">📄 Licenças</div>
-                        ${licencas.length === 0 ? '<p>Nenhuma licença registrada.</p>' : `
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Tipo</th>
-                                        <th>Início</th>
-                                        <th>Fim</th>
-                                        <th>Dias</th>
-                                        <th>Motivo</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${licencas.map(l => {
-                                        const dataInicio = l.inicio.split('-').reverse().join('/');
-                                        const dataFim = l.fim.split('-').reverse().join('/');
-                                        return `
-                                            <tr>
-                                                <td>${l.tipo}</td>
-                                                <td>${dataInicio}</td>
-                                                <td>${dataFim}</td>
-                                                <td>${l.dias}</td>
-                                                <td>${l.motivo || '--'}</td>
-                                            </tr>
-                                        `;
-                                    }).join('')}
-                                </tbody>
-                            </table>
-                        `}
-                        
+                    `;
+                    
+                    html += this.gerarTabelaPontosHTML('todos', periodo);
+                    html += this.gerarTabelaFaltasHTML('todos', periodo);
+                    html += this.gerarTabelaFeriasHTML('todos', periodo);
+                    html += this.gerarTabelaLicencasHTML('todos', periodo);
+                    
+                } else {
+                    const funcionario = this.funcionarios.find(f => f.cpf === selecao);
+                    if (!funcionario) return;
+                    
+                    html += `
+                        <div class="info-funcionario">
+                            <h2>${funcionario.nome}</h2>
+                            <p><strong>Matrícula:</strong> ${funcionario.matricula || '---'} | <strong>CPF:</strong> ${funcionario.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}</p>
+                            <p><strong>Período:</strong> ${periodoTexto}</p>
+                        </div>
+                    `;
+                    
+                    html += this.gerarTabelaPontosHTML(selecao, periodo);
+                    html += this.gerarTabelaFaltasHTML(selecao, periodo);
+                    html += this.gerarTabelaFeriasHTML(selecao, periodo);
+                    html += this.gerarTabelaLicencasHTML(selecao, periodo);
+                }
+                
+                html += `
                         <div class="footer">
                             <p>Relatório gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
                         </div>
@@ -2748,20 +3167,230 @@
                 this.mostrarAlerta('Relatório PDF gerado com sucesso!', 'success');
             }
 
+            gerarTabelaPontosHTML(selecao, periodo) {
+                let dataLimite = null;
+                if (periodo !== 'tudo') {
+                    dataLimite = new Date();
+                    dataLimite.setDate(dataLimite.getDate() - parseInt(periodo));
+                }
+                
+                let registros = this.registros.filter(r => {
+                    if (selecao !== 'todos' && r.funcionarioCpf !== selecao) return false;
+                    if (dataLimite) {
+                        const [ano, mes, dia] = r.data.split('-');
+                        const dataReg = new Date(ano, mes-1, dia);
+                        return dataReg >= dataLimite;
+                    }
+                    return true;
+                }).sort((a, b) => b.data.localeCompare(a.data));
+                
+                if (registros.length === 0) {
+                    return '<div class="section-title">📋 Registros de Ponto</div><p>Nenhum registro encontrado.</p>';
+                }
+                
+                let html = '<div class="section-title">📋 Registros de Ponto</div>';
+                html += '<table><thead><tr><th>Funcionário</th><th>Data</th><th>Entrada</th><th>Almoço</th><th>Volta</th><th>Saída</th><th>Horas</th><th>Extras</th></tr></thead><tbody>';
+                
+                registros.forEach(r => {
+                    const funcionario = this.funcionarios.find(f => f.cpf === r.funcionarioCpf);
+                    let horas = '--', extras = '--';
+                    
+                    if (r.entrada && r.saida) {
+                        const entrada = r.entrada.split(':').map(Number);
+                        const saida = r.saida.split(':').map(Number);
+                        
+                        let minutos = (saida[0] * 60 + saida[1]) - (entrada[0] * 60 + entrada[1]);
+                        
+                        if (r.almoco && r.voltaAlmoco) {
+                            const almoco = r.almoco.split(':').map(Number);
+                            const volta = r.voltaAlmoco.split(':').map(Number);
+                            minutos -= (volta[0] * 60 + volta[1]) - (almoco[0] * 60 + almoco[1]);
+                        }
+                        
+                        horas = Math.floor(minutos / 60) + 'h ' + (minutos % 60) + 'min';
+                        
+                        const saidaMin = saida[0] * 60 + saida[1];
+                        if (saidaMin > 17 * 60 + 45) {
+                            extras = Math.floor((saidaMin - (17 * 60 + 45)) / 60) + 'h';
+                        }
+                    }
+                    
+                    const dataExibicao = r.data.split('-').reverse().join('/');
+                    
+                    html += `
+                        <tr>
+                            <td>${funcionario?.nome || r.funcionarioNome}</td>
+                            <td>${dataExibicao}</td>
+                            <td>${r.entrada || '--'}</td>
+                            <td>${r.almoco || '--'}</td>
+                            <td>${r.voltaAlmoco || '--'}</td>
+                            <td>${r.saida || '--'}</td>
+                            <td>${horas}</td>
+                            <td>${extras}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                return html;
+            }
+
+            gerarTabelaFaltasHTML(selecao, periodo) {
+                let dataLimite = null;
+                if (periodo !== 'tudo') {
+                    dataLimite = new Date();
+                    dataLimite.setDate(dataLimite.getDate() - parseInt(periodo));
+                }
+                
+                let faltas = this.faltas.filter(f => {
+                    if (selecao !== 'todos' && f.funcionarioCpf !== selecao) return false;
+                    if (dataLimite) {
+                        const [ano, mes, dia] = f.data.split('-');
+                        const dataFalta = new Date(ano, mes-1, dia);
+                        return dataFalta >= dataLimite;
+                    }
+                    return true;
+                }).sort((a, b) => b.data.localeCompare(a.data));
+                
+                if (faltas.length === 0) {
+                    return '<div class="section-title">❌ Faltas</div><p>Nenhuma falta registrada.</p>';
+                }
+                
+                let html = '<div class="section-title">❌ Faltas</div>';
+                html += '<table><thead><tr><th>Funcionário</th><th>Data</th><th>Tipo</th><th>Motivo</th></tr></thead><tbody>';
+                
+                faltas.forEach(f => {
+                    const funcionario = this.funcionarios.find(func => func.cpf === f.funcionarioCpf);
+                    const dataExibicao = f.data.split('-').reverse().join('/');
+                    html += `
+                        <tr>
+                            <td>${funcionario?.nome || f.funcionarioCpf}</td>
+                            <td>${dataExibicao}</td>
+                            <td>${f.tipo === 'justificada' ? 'Justificada' : 'Não Justificada'}</td>
+                            <td>${f.motivo || '--'}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                return html;
+            }
+
+            gerarTabelaFeriasHTML(selecao, periodo) {
+                let ferias = this.ferias.filter(f => {
+                    if (selecao !== 'todos' && f.funcionarioCpf !== selecao) return false;
+                    return true;
+                }).sort((a, b) => b.inicio.localeCompare(a.inicio));
+                
+                if (ferias.length === 0) {
+                    return '<div class="section-title">🏖️ Férias</div><p>Nenhum período de férias registrado.</p>';
+                }
+                
+                let html = '<div class="section-title">🏖️ Férias</div>';
+                html += '<table><thead><tr><th>Funcionário</th><th>Período</th><th>Início</th><th>Fim</th><th>Dias</th></tr></thead><tbody>';
+                
+                ferias.forEach(f => {
+                    const funcionario = this.funcionarios.find(func => func.cpf === f.funcionarioCpf);
+                    const dataInicio = f.inicio.split('-').reverse().join('/');
+                    const dataFim = f.fim.split('-').reverse().join('/');
+                    html += `
+                        <tr>
+                            <td>${funcionario?.nome || f.funcionarioCpf}</td>
+                            <td>${f.periodo || '--'}</td>
+                            <td>${dataInicio}</td>
+                            <td>${dataFim}</td>
+                            <td>${f.dias}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                return html;
+            }
+
+            gerarTabelaLicencasHTML(selecao, periodo) {
+                let licencas = this.licencas.filter(l => {
+                    if (selecao !== 'todos' && l.funcionarioCpf !== selecao) return false;
+                    return true;
+                }).sort((a, b) => b.inicio.localeCompare(a.inicio));
+                
+                if (licencas.length === 0) {
+                    return '<div class="section-title">📄 Licenças</div><p>Nenhuma licença registrada.</p>';
+                }
+                
+                let html = '<div class="section-title">📄 Licenças</div>';
+                html += '<table><thead><tr><th>Funcionário</th><th>Tipo</th><th>Início</th><th>Fim</th><th>Dias</th><th>Motivo</th></tr></thead><tbody>';
+                
+                licencas.forEach(l => {
+                    const funcionario = this.funcionarios.find(func => func.cpf === l.funcionarioCpf);
+                    const dataInicio = l.inicio.split('-').reverse().join('/');
+                    const dataFim = l.fim.split('-').reverse().join('/');
+                    html += `
+                        <tr>
+                            <td>${funcionario?.nome || l.funcionarioCpf}</td>
+                            <td>${l.tipo}</td>
+                            <td>${dataInicio}</td>
+                            <td>${dataFim}</td>
+                            <td>${l.dias}</td>
+                            <td>${l.motivo || '--'}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                return html;
+            }
+
             exportarRelatorioCSV() {
-                if (!funcionarioHistoricoAtual) {
+                const selecao = document.getElementById('relatorioFuncionario').value;
+                const periodo = document.getElementById('relatorioPeriodo').value;
+                
+                if (!selecao) {
                     this.mostrarAlerta('Selecione um funcionário!', 'warning');
                     return;
                 }
-                
-                const cpf = funcionarioHistoricoAtual.cpf;
-                const periodo = document.getElementById('relatorioPeriodo').value;
                 
                 let dataLimite = null;
                 if (periodo !== 'tudo') {
                     dataLimite = new Date();
                     dataLimite.setDate(dataLimite.getDate() - parseInt(periodo));
                 }
+                
+                let linhas = [];
+                let nomeArquivo = '';
+                
+                if (selecao === 'todos') {
+                    nomeArquivo = 'todos_funcionarios';
+                    linhas = this.gerarLinhasCSVTodos(dataLimite);
+                } else {
+                    const funcionario = this.funcionarios.find(f => f.cpf === selecao);
+                    if (!funcionario) return;
+                    nomeArquivo = funcionario.nome.replace(/\s/g, '_');
+                    linhas = this.gerarLinhasCSVFuncionario(selecao, dataLimite);
+                }
+                
+                const csvContent = linhas.map(linha => 
+                    linha.map(campo => {
+                        if (campo === null || campo === undefined) return '';
+                        const str = String(campo);
+                        if (str.includes(',') || str.includes('"') || str.includes(';') || str.includes('\n')) {
+                            return `"${str.replace(/"/g, '""')}"`;
+                        }
+                        return str;
+                    }).join(';')
+                ).join('\n');
+                
+                const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `historico_${nomeArquivo}_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`;
+                link.click();
+                
+                this.mostrarAlerta('Relatório CSV exportado com sucesso!', 'success');
+            }
+
+            gerarLinhasCSVFuncionario(cpf, dataLimite) {
+                const linhas = [['TIPO', 'FUNCIONÁRIO', 'DATA', 'DESCRIÇÃO', 'DETALHES']];
                 
                 const registros = this.registros.filter(r => {
                     if (r.funcionarioCpf !== cpf) return false;
@@ -2773,7 +3402,8 @@
                     return true;
                 }).sort((a, b) => b.data.localeCompare(a.data));
                 
-                const linhas = [['TIPO', 'DATA', 'DESCRIÇÃO', 'DETALHES']];
+                const funcionario = this.funcionarios.find(f => f.cpf === cpf);
+                const nomeFuncionario = funcionario?.nome || cpf;
                 
                 registros.forEach(r => {
                     let horas = '--';
@@ -2795,38 +3425,56 @@
                     
                     linhas.push([
                         'PONTO',
+                        nomeFuncionario,
                         dataExibicao,
                         `Entrada: ${r.entrada || '--'} | Almoço: ${r.almoco || '--'} | Volta: ${r.voltaAlmoco || '--'} | Saída: ${r.saida || '--'}`,
                         `Horas: ${horas}`
                     ]);
                 });
                 
-                this.faltas.filter(f => f.funcionarioCpf === cpf).forEach(f => {
+                const faltas = this.faltas.filter(f => {
+                    if (f.funcionarioCpf !== cpf) return false;
+                    if (dataLimite) {
+                        const [ano, mes, dia] = f.data.split('-');
+                        const dataFalta = new Date(ano, mes-1, dia);
+                        return dataFalta >= dataLimite;
+                    }
+                    return true;
+                });
+                
+                faltas.forEach(f => {
                     const dataExibicao = f.data.split('-').reverse().join('/');
                     linhas.push([
                         'FALTA',
+                        nomeFuncionario,
                         dataExibicao,
                         `Tipo: ${f.tipo === 'justificada' ? 'Justificada' : 'Não Justificada'}`,
                         `Motivo: ${f.motivo || '--'}`
                     ]);
                 });
                 
-                this.ferias.filter(f => f.funcionarioCpf === cpf).forEach(f => {
+                const ferias = this.ferias.filter(f => f.funcionarioCpf === cpf);
+                
+                ferias.forEach(f => {
                     const dataInicio = f.inicio.split('-').reverse().join('/');
                     const dataFim = f.fim.split('-').reverse().join('/');
                     linhas.push([
                         'FÉRIAS',
+                        nomeFuncionario,
                         dataInicio,
                         `Período: ${f.periodo || '--'}`,
                         `${f.dias} dias (${dataInicio} a ${dataFim})`
                     ]);
                 });
                 
-                this.licencas.filter(l => l.funcionarioCpf === cpf).forEach(l => {
+                const licencas = this.licencas.filter(l => l.funcionarioCpf === cpf);
+                
+                licencas.forEach(l => {
                     const dataInicio = l.inicio.split('-').reverse().join('/');
                     const dataFim = l.fim.split('-').reverse().join('/');
                     linhas.push([
                         'LICENÇA',
+                        nomeFuncionario,
                         dataInicio,
                         `Tipo: ${l.tipo}`,
                         `${l.dias} dias (${dataInicio} a ${dataFim}) - Motivo: ${l.motivo || '--'}`
@@ -2838,29 +3486,124 @@
                     if (a[0] === 'TIPO') return -1;
                     if (b[0] === 'TIPO') return 1;
                     
-                    const dataA = a[1].split('/').reverse().join('-');
-                    const dataB = b[1].split('/').reverse().join('-');
+                    const dataA = a[2].split('/').reverse().join('-');
+                    const dataB = b[2].split('/').reverse().join('-');
                     return dataB.localeCompare(dataA);
                 });
                 
-                const csvContent = linhas.map(linha => 
-                    linha.map(campo => {
-                        if (campo === null || campo === undefined) return '';
-                        const str = String(campo);
-                        if (str.includes(',') || str.includes('"') || str.includes(';') || str.includes('\n')) {
-                            return `"${str.replace(/"/g, '""')}"`;
+                return linhas;
+            }
+
+            gerarLinhasCSVTodos(dataLimite) {
+                const linhas = [['TIPO', 'FUNCIONÁRIO', 'DATA', 'DESCRIÇÃO', 'DETALHES']];
+                
+                const registros = this.registros.filter(r => {
+                    if (dataLimite) {
+                        const [ano, mes, dia] = r.data.split('-');
+                        const dataReg = new Date(ano, mes-1, dia);
+                        return dataReg >= dataLimite;
+                    }
+                    return true;
+                }).sort((a, b) => b.data.localeCompare(a.data));
+                
+                registros.forEach(r => {
+                    const funcionario = this.funcionarios.find(f => f.cpf === r.funcionarioCpf);
+                    const nomeFuncionario = funcionario?.nome || r.funcionarioNome;
+                    
+                    let horas = '--';
+                    if (r.entrada && r.saida) {
+                        const entrada = r.entrada.split(':').map(Number);
+                        const saida = r.saida.split(':').map(Number);
+                        let minutos = (saida[0] * 60 + saida[1]) - (entrada[0] * 60 + entrada[1]);
+                        
+                        if (r.almoco && r.voltaAlmoco) {
+                            const almoco = r.almoco.split(':').map(Number);
+                            const volta = r.voltaAlmoco.split(':').map(Number);
+                            minutos -= (volta[0] * 60 + volta[1]) - (almoco[0] * 60 + almoco[1]);
                         }
-                        return str;
-                    }).join(';')
-                ).join('\n');
+                        
+                        horas = Math.floor(minutos / 60) + 'h ' + (minutos % 60) + 'min';
+                    }
+                    
+                    const dataExibicao = r.data.split('-').reverse().join('/');
+                    
+                    linhas.push([
+                        'PONTO',
+                        nomeFuncionario,
+                        dataExibicao,
+                        `Entrada: ${r.entrada || '--'} | Almoço: ${r.almoco || '--'} | Volta: ${r.voltaAlmoco || '--'} | Saída: ${r.saida || '--'}`,
+                        `Horas: ${horas}`
+                    ]);
+                });
                 
-                const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `historico_${funcionarioHistoricoAtual.nome.replace(/\s/g, '_')}_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`;
-                link.click();
+                const faltas = this.faltas.filter(f => {
+                    if (dataLimite) {
+                        const [ano, mes, dia] = f.data.split('-');
+                        const dataFalta = new Date(ano, mes-1, dia);
+                        return dataFalta >= dataLimite;
+                    }
+                    return true;
+                });
                 
-                this.mostrarAlerta('Relatório CSV exportado com sucesso!', 'success');
+                faltas.forEach(f => {
+                    const funcionario = this.funcionarios.find(func => func.cpf === f.funcionarioCpf);
+                    const nomeFuncionario = funcionario?.nome || f.funcionarioCpf;
+                    const dataExibicao = f.data.split('-').reverse().join('/');
+                    
+                    linhas.push([
+                        'FALTA',
+                        nomeFuncionario,
+                        dataExibicao,
+                        `Tipo: ${f.tipo === 'justificada' ? 'Justificada' : 'Não Justificada'}`,
+                        `Motivo: ${f.motivo || '--'}`
+                    ]);
+                });
+                
+                const ferias = this.ferias;
+                
+                ferias.forEach(f => {
+                    const funcionario = this.funcionarios.find(func => func.cpf === f.funcionarioCpf);
+                    const nomeFuncionario = funcionario?.nome || f.funcionarioCpf;
+                    const dataInicio = f.inicio.split('-').reverse().join('/');
+                    const dataFim = f.fim.split('-').reverse().join('/');
+                    
+                    linhas.push([
+                        'FÉRIAS',
+                        nomeFuncionario,
+                        dataInicio,
+                        `Período: ${f.periodo || '--'}`,
+                        `${f.dias} dias (${dataInicio} a ${dataFim})`
+                    ]);
+                });
+                
+                const licencas = this.licencas;
+                
+                licencas.forEach(l => {
+                    const funcionario = this.funcionarios.find(func => func.cpf === l.funcionarioCpf);
+                    const nomeFuncionario = funcionario?.nome || l.funcionarioCpf;
+                    const dataInicio = l.inicio.split('-').reverse().join('/');
+                    const dataFim = l.fim.split('-').reverse().join('/');
+                    
+                    linhas.push([
+                        'LICENÇA',
+                        nomeFuncionario,
+                        dataInicio,
+                        `Tipo: ${l.tipo}`,
+                        `${l.dias} dias (${dataInicio} a ${dataFim}) - Motivo: ${l.motivo || '--'}`
+                    ]);
+                });
+                
+                // Ordenar por data (mais recente primeiro)
+                linhas.sort((a, b) => {
+                    if (a[0] === 'TIPO') return -1;
+                    if (b[0] === 'TIPO') return 1;
+                    
+                    const dataA = a[2].split('/').reverse().join('-');
+                    const dataB = b[2].split('/').reverse().join('-');
+                    return dataB.localeCompare(dataA);
+                });
+                
+                return linhas;
             }
 
             exportarCSV() {
@@ -3113,17 +3856,12 @@
 
             registrarFalta() {
                 const dados = {
+                    id: Date.now(),
                     funcionarioCpf: document.getElementById('faltaFuncionario').value,
                     data: document.getElementById('faltaData').value,
                     tipo: document.getElementById('faltaTipo').value,
                     motivo: document.getElementById('faltaMotivo').value,
-                    documentos: arquivosSelecionados.map(f => ({
-                        nome: f.name,
-                        tipo: f.type,
-                        tamanho: f.size,
-                        dataUrl: URL.createObjectURL(f),
-                        data: new Date().toISOString()
-                    }))
+                    documentos: arquivosSelecionados
                 };
                 
                 if (!dados.funcionarioCpf || !dados.data) {
@@ -3136,15 +3874,12 @@
                     return;
                 }
                 
-                this.faltas.push({ 
-                    id: Date.now(), 
-                    ...dados
-                });
+                this.faltas.push(dados);
                 
                 this.salvarDados();
                 this.atualizarTabelaFaltas();
                 this.atualizarDashboard();
-                this.mostrarAlerta('Falta registrada!', 'success');
+                this.mostrarAlerta('Falta registrada com sucesso!', 'success');
                 
                 document.getElementById('faltaMotivo').value = '';
                 document.getElementById('fileList').innerHTML = '';
@@ -3156,6 +3891,7 @@
 
             cadastrarFerias() {
                 const dados = {
+                    id: Date.now(),
                     funcionarioCpf: document.getElementById('feriasFuncionario').value,
                     periodo: document.getElementById('feriasPeriodo').value,
                     inicio: document.getElementById('feriasInicio').value,
@@ -3168,14 +3904,15 @@
                     return;
                 }
                 
-                this.ferias.push({ id: Date.now(), ...dados });
+                this.ferias.push(dados);
                 this.salvarDados();
                 this.atualizarTabelaFerias();
-                this.mostrarAlerta('Férias cadastradas!', 'success');
+                this.mostrarAlerta('Férias cadastradas com sucesso!', 'success');
             }
 
             registrarLicenca() {
                 const dados = {
+                    id: Date.now(),
                     funcionarioCpf: document.getElementById('licencaFuncionario').value,
                     tipo: document.getElementById('licencaTipo').value,
                     inicio: document.getElementById('licencaInicio').value,
@@ -3189,10 +3926,10 @@
                     return;
                 }
                 
-                this.licencas.push({ id: Date.now(), ...dados });
+                this.licencas.push(dados);
                 this.salvarDados();
                 this.atualizarTabelaLicencas();
-                this.mostrarAlerta('Licença registrada!', 'success');
+                this.mostrarAlerta('Licença registrada com sucesso!', 'success');
             }
 
             criarUsuario() {
@@ -3293,6 +4030,7 @@
         window.carregarHistoricoFuncionario = () => sistema.carregarHistoricoFuncionario();
         window.gerarRelatorioPDF = () => sistema.gerarRelatorioPDF();
         window.exportarRelatorioCSV = () => sistema.exportarRelatorioCSV();
+        
         window.mudarAbaHistorico = (aba) => {
             abaHistoricoAtual = aba;
             
@@ -3326,6 +4064,12 @@
             sistema.fecharModalRecuperar();
         };
 
+        window.abrirModalEditar = (tipo, item) => {
+            // Recriar o objeto para evitar problemas de referência
+            const itemClone = JSON.parse(JSON.stringify(item));
+            abrirModalEditar(tipo, itemClone);
+        };
+
         document.getElementById('confirmarExcluir').onclick = () => {
             if (sistema.funcionarioParaExcluir) {
                 sistema.excluirFuncionario(sistema.funcionarioParaExcluir);
@@ -3348,10 +4092,13 @@
             const modalRec = document.getElementById('modalRecuperarSenha');
             const modalDocs = document.getElementById('modalVisualizarDocs');
             const modalCartorio = document.getElementById('modalEsqueciSenhaCartorio');
+            const modalEditar = document.getElementById('modalEditar');
+            
             if (e.target === modal) sistema.fecharModal();
             if (e.target === modalRec) fecharModalRecuperar();
             if (e.target === modalDocs) fecharModalDocs();
             if (e.target === modalCartorio) fecharModalEsqueciSenhaCartorio();
+            if (e.target === modalEditar) fecharModalEditar();
         };
     </script>
 </body>
