@@ -565,36 +565,69 @@
         </div>
     </div>
 
-    <div class="footer">Sistema de Ponto v6.0 - Data Corrigida</div>
+    <div class="footer">Sistema de Ponto v7.0 - Data Corrigida</div>
 
     <script>
-        // ========== SENHA DO CARTÓRIO ==========
+        // ========== CONFIGURAÇÕES ==========
         let senhaCartorioAtual = "Registroponto51374@";
         let senhaMestra = "admin51374@";
         let funcionarioAtual = null;
         let cpfRecuperar = null;
 
-        // Função para obter a data local do Brasil (formato YYYY-MM-DD)
+        // ========== CONTROLE DE SESSÃO ==========
+        // Verificar se já passou pela senha do cartório
+        if (sessionStorage.getItem('cartorioAutorizado')) {
+            document.getElementById('loginCartorio').style.display = 'none';
+            document.getElementById('sistemaContainer').style.display = 'block';
+            iniciarRelogio();
+            
+            // Verificar se funcionário estava logado
+            const funcionarioSalvo = sessionStorage.getItem('funcionarioLogado');
+            if (funcionarioSalvo) {
+                funcionarioAtual = JSON.parse(funcionarioSalvo);
+                document.getElementById('loginArea').style.display = 'none';
+                document.getElementById('pontoArea').style.display = 'block';
+                document.getElementById('nomeFuncionario').textContent = funcionarioAtual.nome;
+                document.getElementById('matriculaFuncionario').textContent = `Matrícula: ${funcionarioAtual.matricula || '---'}`;
+                const cpfFormatado = funcionarioAtual.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                document.getElementById('cpfFuncionario').textContent = `CPF: ${cpfFormatado}`;
+                atualizarStatusBotoes();
+            }
+        } else {
+            document.getElementById('loginCartorio').style.display = 'block';
+            document.getElementById('sistemaContainer').style.display = 'none';
+        }
+
+        // ========== FUNÇÃO CORRIGIDA PARA DATA LOCAL ==========
         function getDataLocalBrasil() {
             const agora = new Date();
-            // Ajuste manual para UTC-3 (Brasil)
-            const horaLocal = new Date(agora.getTime() - (3 * 60 * 60 * 1000));
-            const ano = horaLocal.getUTCFullYear();
-            const mes = String(horaLocal.getUTCMonth() + 1).padStart(2, '0');
-            const dia = String(horaLocal.getUTCDate()).padStart(2, '0');
+            
+            // Método 1: Usando Intl.DateTimeFormat (mais confiável)
+            const options = { 
+                timeZone: 'America/Sao_Paulo', 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit' 
+            };
+            const dataFormatada = new Intl.DateTimeFormat('pt-BR', options).format(agora);
+            // Retorna no formato DD/MM/YYYY, vamos converter para YYYY-MM-DD
+            const [dia, mes, ano] = dataFormatada.split('/');
             return `${ano}-${mes}-${dia}`;
         }
 
-        // Função para obter a hora local do Brasil (formato HH:MM:SS)
         function getHoraLocalBrasil() {
             const agora = new Date();
-            const horaLocal = new Date(agora.getTime() - (3 * 60 * 60 * 1000));
-            const horas = String(horaLocal.getUTCHours()).padStart(2, '0');
-            const minutos = String(horaLocal.getUTCMinutes()).padStart(2, '0');
-            const segundos = String(horaLocal.getUTCSeconds()).padStart(2, '0');
-            return `${horas}:${minutos}:${segundos}`;
+            const options = { 
+                timeZone: 'America/Sao_Paulo', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: false 
+            };
+            return new Intl.DateTimeFormat('pt-BR', options).format(agora);
         }
 
+        // ========== FUNÇÕES DO CARTÓRIO ==========
         window.toggleSenha = () => {
             const input = document.getElementById('senhaCartorio');
             const btn = document.getElementById('toggleSenhaBtn');
@@ -612,6 +645,7 @@
             const senha = document.getElementById('senhaCartorio').value;
             
             if (senha === senhaCartorioAtual) {
+                sessionStorage.setItem('cartorioAutorizado', 'true');
                 document.getElementById('loginCartorio').style.display = 'none';
                 document.getElementById('sistemaContainer').style.display = 'block';
                 iniciarRelogio();
@@ -671,11 +705,9 @@
         }
 
         function atualizarRelogio() {
-            // Usar data local do Brasil
             const dataLocal = getDataLocalBrasil();
             const horaLocal = getHoraLocalBrasil();
             
-            // Formatar para exibição
             const [ano, mes, dia] = dataLocal.split('-');
             document.getElementById('clockTime').textContent = horaLocal;
             document.getElementById('clockDate').textContent = `${dia}/${mes}/${ano}`;
@@ -730,13 +762,15 @@
             if (funcionario) {
                 funcionarioAtual = funcionario;
                 
+                // Salvar na sessão
+                sessionStorage.setItem('funcionarioLogado', JSON.stringify(funcionario));
+                
                 document.getElementById('loginArea').style.display = 'none';
                 document.getElementById('pontoArea').style.display = 'block';
                 
                 document.getElementById('nomeFuncionario').textContent = funcionario.nome;
                 document.getElementById('matriculaFuncionario').textContent = `Matrícula: ${funcionario.matricula || '---'}`;
                 
-                // Formatar CPF para exibição
                 const cpfFormatado = funcionario.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
                 document.getElementById('cpfFuncionario').textContent = `CPF: ${cpfFormatado}`;
                 
@@ -749,6 +783,7 @@
 
         window.logoutFuncionario = () => {
             funcionarioAtual = null;
+            sessionStorage.removeItem('funcionarioLogado');
             document.getElementById('loginArea').style.display = 'block';
             document.getElementById('pontoArea').style.display = 'none';
             document.getElementById('loginCpf').value = '';
@@ -760,10 +795,14 @@
             if (!funcionarioAtual) return;
             
             const hoje = getDataLocalBrasil();
+            console.log('Data de hoje (Brasil):', hoje);
+            
             const registros = carregarRegistros();
             const registroHoje = registros.find(r => 
                 r.funcionarioCpf === funcionarioAtual.cpf && r.data === hoje
             );
+            
+            console.log('Registro de hoje:', registroHoje);
             
             // Atualizar botões
             document.getElementById('btnEntrada').disabled = registroHoje?.entrada ? true : false;
@@ -792,7 +831,6 @@
         window.registrarPonto = (tipo) => {
             if (!funcionarioAtual) return;
             
-            // CORREÇÃO: Usar data e hora local do Brasil
             const dataLocal = getDataLocalBrasil();
             const horaLocal = getHoraLocalBrasil();
             
