@@ -27,6 +27,8 @@
         .login-cartorio {
             max-width: 400px;
             margin: 50px auto;
+            position: relative;
+            z-index: 2;
         }
 
         .login-cartorio-card {
@@ -99,6 +101,7 @@
         .login-container {
             max-width: 450px;
             margin: 50px auto;
+            display: none;
         }
 
         .login-card {
@@ -635,6 +638,7 @@
     </style>
 </head>
 <body>
+    <!-- TELA DE LOGIN DO CARTÓRIO -->
     <div id="loginCartorio" class="login-cartorio">
         <div class="login-cartorio-card">
             <div class="header">
@@ -654,7 +658,7 @@
                 <a onclick="abrirModalEsqueciSenhaCartorio()">Esqueci a senha</a>
             </div>
 
-            <button class="btn btn-primary btn-login" onclick="verificarSenhaCartorio()">Entrar</button>
+            <button class="btn btn-primary btn-login" onclick="verificarSenhaCartorio()">Entrar no Sistema</button>
 
             <div class="info-box" style="margin-top: 20px;">
                 <strong>ℹ️ Informação:</strong>
@@ -665,7 +669,7 @@
     </div>
 
     <!-- TELA DE LOGIN ADMIN -->
-    <div id="loginScreen" class="login-container" style="display: none;">
+    <div id="loginScreen" class="login-container">
         <div class="login-card">
             <div class="header">
                 <h1>🏢 Oficial de Registro Civil</h1>
@@ -1424,7 +1428,7 @@
         </div>
     </div>
 
-    <div class="footer">Sistema Administrativo v9.0 - Acesso Seguro</div>
+    <div class="footer">Sistema Administrativo v10.0 - Acesso Seguro</div>
 
     <script>
         // ========== SENHA DO CARTÓRIO ==========
