@@ -496,6 +496,36 @@
                 </div>
             </div>
 
+            <!-- TELA DE PRIMEIRO ACESSO (criar senha) -->
+            <div id="primeiroAcessoArea" style="display: none;">
+                <h3 style="text-align: center; margin-bottom: 20px;">🆕 Primeiro Acesso</h3>
+                <p style="text-align: center; margin-bottom: 20px;">Crie sua senha de acesso</p>
+                
+                <form onsubmit="criarPrimeiroAcesso(event)">
+                    <div class="form-group">
+                        <label>CPF</label>
+                        <input type="text" id="primeiroCpf" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Nova Senha</label>
+                        <input type="password" id="primeiroNovaSenha" class="form-control" placeholder="Crie sua senha" onkeyup="validarSenha()">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmar Senha</label>
+                        <input type="password" id="primeiroConfirmarSenha" class="form-control" placeholder="Digite novamente" onkeyup="validarSenha()">
+                    </div>
+
+                    <div class="password-requirements" id="requisitosSenha">
+                        <strong>Requisitos:</strong>
+                        <div class="requirement" id="reqLength">Mínimo 6 caracteres</div>
+                        <div class="requirement" id="reqMatch">Senhas coincidem</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success" id="btnCriarSenha" disabled>Criar Senha</button>
+                    <button type="button" class="btn btn-danger" onclick="voltarParaLogin()">Cancelar</button>
+                </form>
+            </div>
+
             <!-- TELA DO FUNCIONÁRIO (APÓS LOGIN) -->
             <div id="pontoArea" style="display: none;">
                 <div style="text-align: center; margin-bottom: 20px;">
@@ -595,13 +625,14 @@
             </div>
         </div>
 
-        <div class="footer">Sistema de Ponto v5.0 - Acesso Seguro</div>
+        <div class="footer">Sistema de Ponto v6.0 - Acesso Seguro</div>
     </div>
 
     <script>
         // ========== SENHA DO CARTÓRIO ==========
         let senhaCartorioAtual = "Registroponto51374@";
         let senhaMestra = "admin51374@";
+        let cpfPrimeiroAcesso = null;
 
         window.toggleSenha = () => {
             const input = document.getElementById('senhaCartorio');
@@ -702,7 +733,6 @@
                 
                 this.carregarDados();
                 this.iniciarRelogio();
-                this.verificarPrimeiroAcesso();
             }
 
             carregarDados() {
@@ -737,25 +767,6 @@
                 
                 atualizar();
                 setInterval(atualizar, 1000);
-            }
-
-            verificarPrimeiroAcesso() {
-                // Remove a aba de primeiro acesso - agora o sistema detecta automaticamente
-                const cpfInput = document.getElementById('loginCpf');
-                if (cpfInput) {
-                    cpfInput.addEventListener('blur', () => {
-                        const cpf = cpfInput.value;
-                        if (cpf.length === 11 && validarCPF(cpf)) {
-                            const funcionario = this.funcionarios.find(f => f.cpf === cpf);
-                            if (funcionario && !funcionario.senha) {
-                                this.mostrarAlerta('Primeiro acesso! Crie sua senha.', 'info');
-                                setTimeout(() => {
-                                    window.location.href = 'primeiro_acesso.html?cpf=' + cpf;
-                                }, 2000);
-                            }
-                        }
-                    });
-                }
             }
 
             mostrarAlerta(mensagem, tipo) {
@@ -796,10 +807,11 @@
                 }
 
                 if (!funcionario.senha) {
-                    this.mostrarAlerta('Primeiro acesso! Redirecionando...', 'info');
-                    setTimeout(() => {
-                        this.abrirPrimeiroAcesso(cpf);
-                    }, 2000);
+                    this.mostrarAlerta('Primeiro acesso! Crie sua senha.', 'info');
+                    cpfPrimeiroAcesso = cpf;
+                    document.getElementById('primeiroCpf').value = cpf;
+                    document.getElementById('loginArea').style.display = 'none';
+                    document.getElementById('primeiroAcessoArea').style.display = 'block';
                     return false;
                 }
 
@@ -814,13 +826,67 @@
                 return true;
             }
 
-            abrirPrimeiroAcesso(cpf) {
-                // Redirecionar para página de primeiro acesso com CPF preenchido
-                window.location.href = 'primeiro_acesso.html?cpf=' + cpf;
+            // ========== PRIMEIRO ACESSO (criar senha) ==========
+            criarPrimeiroAcesso(cpf, senha, confirmar) {
+                if (!validarCPF(cpf)) {
+                    this.mostrarAlerta('CPF inválido!', 'danger');
+                    return false;
+                }
+
+                if (senha !== confirmar) {
+                    this.mostrarAlerta('Senhas não coincidem!', 'warning');
+                    return false;
+                }
+
+                if (senha.length < 6) {
+                    this.mostrarAlerta('Senha deve ter 6+ caracteres!', 'warning');
+                    return false;
+                }
+
+                const funcionario = this.funcionarios.find(f => f.cpf === cpf);
+
+                if (!funcionario) {
+                    this.mostrarAlerta('CPF não encontrado!', 'danger');
+                    return false;
+                }
+
+                if (!funcionario.ativo) {
+                    this.mostrarAlerta('Funcionário inativo!', 'warning');
+                    return false;
+                }
+
+                if (funcionario.senha) {
+                    this.mostrarAlerta('Você já tem senha! Faça login.', 'warning');
+                    this.voltarParaLogin();
+                    return false;
+                }
+
+                funcionario.senha = senha;
+                this.salvarDados();
+
+                this.mostrarAlerta('Senha criada! Faça login.', 'success');
+                
+                document.getElementById('primeiroNovaSenha').value = '';
+                document.getElementById('primeiroConfirmarSenha').value = '';
+                
+                setTimeout(() => {
+                    this.voltarParaLogin();
+                }, 2000);
+
+                return true;
+            }
+
+            voltarParaLogin() {
+                document.getElementById('primeiroAcessoArea').style.display = 'none';
+                document.getElementById('loginArea').style.display = 'block';
+                document.getElementById('loginCpf').value = '';
+                document.getElementById('loginSenha').value = '';
+                cpfPrimeiroAcesso = null;
             }
 
             mostrarTelaPonto() {
                 document.getElementById('loginArea').style.display = 'none';
+                document.getElementById('primeiroAcessoArea').style.display = 'none';
                 document.getElementById('pontoArea').style.display = 'block';
                 
                 document.getElementById('nomeFuncionario').textContent = this.funcionarioAtual.nome;
@@ -883,7 +949,6 @@
                     return;
                 }
 
-                // SIMULAÇÃO DE ENVIO DE E-MAIL
                 this.cpfRecuperar = cpf;
                 this.fecharModalEsqueci();
                 
@@ -1058,11 +1123,37 @@
             document.getElementById(`tab-${tab}-func`).classList.add('active');
         };
 
+        window.validarSenha = () => {
+            const senha = document.getElementById('primeiroNovaSenha').value;
+            const confirmar = document.getElementById('primeiroConfirmarSenha').value;
+            const btn = document.getElementById('btnCriarSenha');
+
+            const lengthOk = senha.length >= 6;
+            const matchOk = senha === confirmar && senha.length > 0;
+
+            document.getElementById('reqLength').className = `requirement ${lengthOk ? 'met' : ''}`;
+            document.getElementById('reqMatch').className = `requirement ${matchOk ? 'met' : ''}`;
+
+            btn.disabled = !(lengthOk && matchOk);
+        };
+
         window.fazerLoginFuncionario = (e) => {
             e.preventDefault();
             const cpf = document.getElementById('loginCpf').value;
             const senha = document.getElementById('loginSenha').value;
             sistema.fazerLogin(cpf, senha);
+        };
+
+        window.criarPrimeiroAcesso = (e) => {
+            e.preventDefault();
+            const cpf = document.getElementById('primeiroCpf').value;
+            const senha = document.getElementById('primeiroNovaSenha').value;
+            const confirmar = document.getElementById('primeiroConfirmarSenha').value;
+            sistema.criarPrimeiroAcesso(cpf, senha, confirmar);
+        };
+
+        window.voltarParaLogin = () => {
+            sistema.voltarParaLogin();
         };
 
         window.registrarPonto = (tipo) => sistema.registrarPonto(tipo);
