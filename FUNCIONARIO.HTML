@@ -357,12 +357,9 @@
     <script>
         // ===== AUTENTICAÇÃO OFUSCADA DO CARTÓRIO =====
         (function() {
-            // Senha ofuscada: Registroponto51374@
-            // Convertida para códigos charCode para não aparecer diretamente
             const senhaOfuscada = [82, 101, 103, 105, 115, 116, 114, 111, 112, 111, 110, 116, 111, 53, 49, 51, 55, 52, 64];
             const senhaCorreta = senhaOfuscada.map(c => String.fromCharCode(c)).join('');
             
-            // Verifica se já está autenticado nesta sessão
             if (!sessionStorage.getItem('acessoCartorio')) {
                 const senhaDigitada = prompt("🔐 ACESSO RESTRITO AO CARTÓRIO\nDigite a senha de acesso:");
                 
@@ -380,8 +377,6 @@
                     `;
                     throw new Error("Acesso negado");
                 }
-                
-                // Marca como autenticado para a sessão
                 sessionStorage.setItem('acessoCartorio', 'true');
             }
         })();
@@ -533,7 +528,7 @@
             </div>
         </div>
 
-        <div class="footer">Sistema de Ponto v3.0 - Acesso Restrito</div>
+        <div class="footer">Sistema de Ponto v4.0 - Com Recuperação de Senha</div>
     </div>
 
     <script>
@@ -836,7 +831,6 @@
                     this.mostrarAlerta('Senha alterada com sucesso! Faça login.', 'success');
                     this.fecharModalRedefinir();
                     
-                    // Voltar para aba de login
                     setTimeout(() => {
                         mudarTab('login');
                     }, 2000);
@@ -996,14 +990,12 @@
         window.registrarPonto = (tipo) => sistema.registrarPonto(tipo);
         window.logout = () => sistema.logout();
 
-        // Funções de recuperação de senha
         window.abrirModalEsqueciSenha = () => sistema.abrirModalEsqueciSenha();
         window.fecharModalEsqueci = () => sistema.fecharModalEsqueci();
         window.enviarRecuperacao = () => sistema.enviarRecuperacao();
         window.fecharModalRedefinir = () => sistema.fecharModalRedefinir();
         window.salvarNovaSenha = () => sistema.salvarNovaSenha();
 
-        // Fechar modais ao clicar fora
         window.onclick = (e) => {
             const modalEsqueci = document.getElementById('modalEsqueciSenha');
             const modalRedefinir = document.getElementById('modalRedefinirSenha');
