@@ -27,8 +27,6 @@
         .login-cartorio {
             max-width: 400px;
             margin: 50px auto;
-            position: relative;
-            z-index: 2;
         }
 
         .login-cartorio-card {
@@ -276,37 +274,6 @@
             color: #333;
             display: block;
             margin-bottom: 5px;
-        }
-
-        .password-requirements {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-            font-size: 13px;
-        }
-
-        .requirement {
-            color: #666;
-            margin: 5px 0;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .requirement::before {
-            content: "•";
-            position: absolute;
-            left: 5px;
-            color: #667eea;
-        }
-
-        .requirement.met {
-            color: #28a745;
-        }
-
-        .requirement.met::before {
-            content: "✓";
-            color: #28a745;
         }
 
         /* Sistema Principal */
@@ -1435,6 +1402,13 @@
         let senhaCartorioAtual = "Registroponto51374@";
         let senhaMestra = "admin51374@";
 
+        // Garantir que apenas a tela de login do cartório aparece inicialmente
+        window.onload = function() {
+            document.getElementById('loginCartorio').style.display = 'block';
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainSystem').style.display = 'none';
+        };
+
         window.toggleSenha = () => {
             const input = document.getElementById('senhaCartorio');
             const btn = document.getElementById('toggleSenhaBtn');
@@ -2445,6 +2419,7 @@
             }
 
             mostrarSistemaPrincipal() {
+                document.getElementById('loginCartorio').style.display = 'none';
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('mainSystem').style.display = 'block';
                 
