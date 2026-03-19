@@ -421,8 +421,6 @@
         .badge-warning { background: #fff3cd; color: #856404; }
         .badge-danger { background: #f8d7da; color: #721c24; }
         .badge-info { background: #d1ecf1; color: #0c5460; }
-        .badge-admin { background: #dc3545; color: white; }
-        .badge-user { background: #28a745; color: white; }
 
         .action-buttons {
             display: flex;
@@ -542,31 +540,6 @@
         .alert-warning { background: #fff3cd; color: #856404; }
         .alert-danger { background: #f8d7da; color: #721c24; }
         .alert-info { background: #d1ecf1; color: #0c5460; }
-
-        .loading {
-            display: none;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .loading.active {
-            display: block;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
 
         .footer {
             text-align: center;
@@ -1402,7 +1375,6 @@
         let senhaCartorioAtual = "Registroponto51374@";
         let senhaMestra = "admin51374@";
 
-        // Garantir que apenas a tela de login do cartório aparece inicialmente
         window.onload = function() {
             document.getElementById('loginCartorio').style.display = 'block';
             document.getElementById('loginScreen').style.display = 'none';
@@ -1469,7 +1441,6 @@
             fecharModalEsqueciSenhaCartorio();
         };
 
-        // Função para permitir apenas números
         window.onlyNumbers = (e) => {
             const charCode = (e.which) ? e.which : e.keyCode;
             if (charCode > 31 && (charCode < 48 || charCode > 57)) {
@@ -1478,7 +1449,6 @@
             return true;
         };
 
-        // ========== VALIDAÇÃO DE CPF ==========
         function validarCPF(cpf) {
             cpf = cpf.replace(/\D/g, '');
             if (cpf.length !== 11) return false;
@@ -1499,18 +1469,15 @@
             return true;
         }
 
-        // ========== VALIDAÇÃO DE EMAIL ==========
         function validarEmail(email) {
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return re.test(email);
         }
 
-        // ========== VARIÁVEIS GLOBAIS PARA UPLOAD ==========
         let arquivosSelecionados = [];
         let funcionarioHistoricoAtual = null;
         let abaHistoricoAtual = 'pontos';
 
-        // ========== FUNÇÕES DE UPLOAD ==========
         window.toggleJustificativa = () => {
             const tipo = document.getElementById('faltaTipo').value;
             document.getElementById('areaJustificativa').style.display = tipo === 'justificada' ? 'block' : 'none';
@@ -1634,7 +1601,6 @@
             document.getElementById('modalVisualizarDocs').style.display = 'block';
         };
 
-        // ========== FUNÇÕES DO RELATÓRIO ==========
         window.carregarHistoricoFuncionario = () => {
             const cpf = document.getElementById('relatorioFuncionario').value;
             const periodo = document.getElementById('relatorioPeriodo').value;
@@ -2301,7 +2267,6 @@
             sistema.mostrarAlerta('Relatório exportado!', 'success');
         };
 
-        // ==================== SISTEMA COMPLETO ====================
         class SistemaCompleto {
             constructor() {
                 this.usuarioAtual = null;
@@ -2320,25 +2285,40 @@
             }
 
             carregarDados() {
-                const users = localStorage.getItem('usuariosAdmin');
-                this.usuarios = users ? JSON.parse(users) : [];
-                
-                const funcs = localStorage.getItem('funcionarios');
-                this.funcionarios = funcs ? JSON.parse(funcs) : [];
-                
-                this.registros = JSON.parse(localStorage.getItem('registrosPonto')) || [];
-                this.faltas = JSON.parse(localStorage.getItem('faltas')) || [];
-                this.ferias = JSON.parse(localStorage.getItem('ferias')) || [];
-                this.licencas = JSON.parse(localStorage.getItem('licencas')) || [];
+                try {
+                    const users = localStorage.getItem('usuariosAdmin');
+                    this.usuarios = users ? JSON.parse(users) : [];
+                    
+                    const funcs = localStorage.getItem('funcionarios');
+                    this.funcionarios = funcs ? JSON.parse(funcs) : [];
+                    
+                    this.registros = JSON.parse(localStorage.getItem('registrosPonto')) || [];
+                    this.faltas = JSON.parse(localStorage.getItem('faltas')) || [];
+                    this.ferias = JSON.parse(localStorage.getItem('ferias')) || [];
+                    this.licencas = JSON.parse(localStorage.getItem('licencas')) || [];
+                } catch (e) {
+                    console.error('Erro ao carregar dados:', e);
+                    this.usuarios = [];
+                    this.funcionarios = [];
+                    this.registros = [];
+                    this.faltas = [];
+                    this.ferias = [];
+                    this.licencas = [];
+                }
             }
 
             salvarDados() {
-                localStorage.setItem('usuariosAdmin', JSON.stringify(this.usuarios));
-                localStorage.setItem('funcionarios', JSON.stringify(this.funcionarios));
-                localStorage.setItem('registrosPonto', JSON.stringify(this.registros));
-                localStorage.setItem('faltas', JSON.stringify(this.faltas));
-                localStorage.setItem('ferias', JSON.stringify(this.ferias));
-                localStorage.setItem('licencas', JSON.stringify(this.licencas));
+                try {
+                    localStorage.setItem('usuariosAdmin', JSON.stringify(this.usuarios));
+                    localStorage.setItem('funcionarios', JSON.stringify(this.funcionarios));
+                    localStorage.setItem('registrosPonto', JSON.stringify(this.registros));
+                    localStorage.setItem('faltas', JSON.stringify(this.faltas));
+                    localStorage.setItem('ferias', JSON.stringify(this.ferias));
+                    localStorage.setItem('licencas', JSON.stringify(this.licencas));
+                } catch (e) {
+                    console.error('Erro ao salvar dados:', e);
+                    this.mostrarAlerta('Erro ao salvar dados!', 'danger');
+                }
             }
 
             verificarPrimeiroAcesso() {
@@ -2354,12 +2334,15 @@
             verificarSessao() {
                 const savedUser = localStorage.getItem('usuarioLogado');
                 if (savedUser) {
-                    this.usuarioAtual = JSON.parse(savedUser);
-                    this.mostrarSistemaPrincipal();
+                    try {
+                        this.usuarioAtual = JSON.parse(savedUser);
+                        this.mostrarSistemaPrincipal();
+                    } catch (e) {
+                        localStorage.removeItem('usuarioLogado');
+                    }
                 }
             }
 
-            // ========== LOGIN ADMIN ==========
             criarPrimeiroAcesso(dados) {
                 if (this.usuarios.length > 0) {
                     this.mostrarAlerta('Já existe admin! Faça login.', 'warning', 'login');
@@ -2442,7 +2425,6 @@
                 setTimeout(() => alert.remove(), 3000);
             }
 
-            // ========== FUNCIONÁRIOS ==========
             atualizarSelects() {
                 const selects = [
                     'filtroFuncionario', 
@@ -2466,10 +2448,10 @@
             cadastrarFuncionario() {
                 if (!this.usuarioAtual) return;
                 
-                const nome = document.getElementById('novoFuncionarioNome').value;
-                const cpf = document.getElementById('novoFuncionarioCpf').value;
-                const matricula = document.getElementById('novoFuncionarioMatricula').value;
-                const email = document.getElementById('novoFuncionarioEmail').value;
+                const nome = document.getElementById('novoFuncionarioNome').value.trim();
+                const cpf = document.getElementById('novoFuncionarioCpf').value.trim();
+                const matricula = document.getElementById('novoFuncionarioMatricula').value.trim();
+                const email = document.getElementById('novoFuncionarioEmail').value.trim();
                 
                 if (!nome || !cpf || !matricula || !email) {
                     this.mostrarAlerta('Preencha todos os campos!', 'warning');
@@ -2520,11 +2502,28 @@
             }
 
             excluirFuncionario(cpf) {
+                // Remove o funcionário da lista
                 this.funcionarios = this.funcionarios.filter(f => f.cpf !== cpf);
+                
+                // Remove todos os registros relacionados ao funcionário
+                this.registros = this.registros.filter(r => r.funcionarioCpf !== cpf);
+                this.faltas = this.faltas.filter(f => f.funcionarioCpf !== cpf);
+                this.ferias = this.ferias.filter(f => f.funcionarioCpf !== cpf);
+                this.licencas = this.licencas.filter(l => l.funcionarioCpf !== cpf);
+                
+                // Salva todas as alterações no localStorage
                 this.salvarDados();
+                
+                // Atualiza todas as telas
                 this.atualizarListaFuncionarios();
                 this.atualizarSelects();
-                this.mostrarAlerta('Funcionário excluído!', 'success');
+                this.atualizarDashboard();
+                this.atualizarTabelaRegistros();
+                this.atualizarTabelaFaltas();
+                this.atualizarTabelaFerias();
+                this.atualizarTabelaLicencas();
+                
+                this.mostrarAlerta('Funcionário e todos os seus registros excluídos com sucesso!', 'success');
             }
 
             toggleFuncionarioStatus(cpf) {
@@ -2537,7 +2536,6 @@
                 }
             }
 
-            // ========== RECUPERAÇÃO DE SENHA ==========
             abrirModalRecuperar(cpf, nome) {
                 this.funcionarioRecuperar = cpf;
                 document.getElementById('recuperarMensagem').innerHTML = `Recuperar senha de <strong>${nome}</strong>`;
@@ -2580,7 +2578,6 @@
                 }
             }
 
-            // ========== ATUALIZAÇÕES DE TELA ==========
             atualizarTodasTelas() {
                 this.atualizarDashboard();
                 this.atualizarListaFuncionarios();
@@ -2614,16 +2611,19 @@
                     .slice(0, 5);
                 
                 if (ultimos.length > 0) {
-                    document.getElementById('ultimosRegistros').innerHTML = ultimos.map(r => `
-                        <tr>
-                            <td>${new Date(r.data).toLocaleDateString('pt-BR')}</td>
-                            <td>${r.funcionarioNome}</td>
-                            <td>${r.entrada || '--'}</td>
-                            <td>${r.almoco || '--'}</td>
-                            <td>${r.voltaAlmoco || '--'}</td>
-                            <td>${r.saida || '--'}</td>
-                        </tr>
-                    `).join('');
+                    document.getElementById('ultimosRegistros').innerHTML = ultimos.map(r => {
+                        const funcionario = this.funcionarios.find(f => f.cpf === r.funcionarioCpf);
+                        return `
+                            <tr>
+                                <td>${new Date(r.data).toLocaleDateString('pt-BR')}</td>
+                                <td>${funcionario?.nome || r.funcionarioNome}</td>
+                                <td>${r.entrada || '--'}</td>
+                                <td>${r.almoco || '--'}</td>
+                                <td>${r.voltaAlmoco || '--'}</td>
+                                <td>${r.saida || '--'}</td>
+                            </tr>
+                        `;
+                    }).join('');
                 } else {
                     document.getElementById('ultimosRegistros').innerHTML = '<tr><td colspan="6">Nenhum registro</td></tr>';
                 }
@@ -2657,13 +2657,13 @@
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="btn btn-info btn-sm" onclick="abrirModalRecuperar('${f.cpf}', '${f.nome}')">
+                                    <button class="btn btn-info btn-sm" onclick="sistema.abrirModalRecuperar('${f.cpf}', '${f.nome}')">
                                         🔑 Reset Senha
                                     </button>
-                                    <button class="btn btn-warning btn-sm" onclick="toggleFuncionarioStatus('${f.cpf}')">
+                                    <button class="btn btn-warning btn-sm" onclick="sistema.toggleFuncionarioStatus('${f.cpf}')">
                                         ${f.ativo !== false ? 'Desativar' : 'Ativar'}
                                     </button>
-                                    <button class="btn btn-danger btn-sm" onclick="confirmarExcluirFuncionario('${f.cpf}', '${f.nome}')">
+                                    <button class="btn btn-danger btn-sm" onclick="sistema.confirmarExcluirFuncionario('${f.cpf}', '${f.nome}')">
                                         Excluir
                                     </button>
                                 </div>
@@ -2773,7 +2773,7 @@
                             </td>
                             <td>
                                 ${numDocs > 0 ? 
-                                    `<button class="btn btn-info btn-sm" onclick="visualizarDocumentos(${f.id})">📎 Ver Docs</button>` : 
+                                    `<button class="btn btn-info btn-sm" onclick="sistema.visualizarDocumentos(${f.id})">📎 Ver Docs</button>` : 
                                     '--'
                                 }
                             </td>
@@ -2840,14 +2840,13 @@
                         <td>${u.nome}</td>
                         <td>
                             ${u.id !== this.usuarioAtual?.id ? `
-                                <button class="btn btn-danger btn-sm" onclick="deletarUsuario(${u.id})">Deletar</button>
+                                <button class="btn btn-danger btn-sm" onclick="sistema.deletarUsuario(${u.id})">Deletar</button>
                             ` : ''}
                         </td>
                     </tr>
                 `).join('');
             }
 
-            // ========== EXPORTAÇÕES ==========
             exportarCSV() {
                 if (this.registros.length === 0) {
                     this.mostrarAlerta('Nenhum registro para exportar!', 'warning');
@@ -3155,7 +3154,6 @@
                 this.mostrarAlerta('Relatório gerado!', 'success');
             }
 
-            // ========== REGISTROS ==========
             registrarFalta() {
                 const dados = {
                     funcionarioCpf: document.getElementById('faltaFuncionario').value,
@@ -3277,11 +3275,55 @@
                 this.salvarDados();
                 this.atualizarListaUsuarios();
             }
+
+            confirmarExcluirFuncionario(cpf, nome) {
+                this.funcionarioParaExcluir = cpf;
+                document.getElementById('modalMensagem').textContent = `Excluir ${nome} e todos os seus registros?`;
+                document.getElementById('modalExcluir').style.display = 'block';
+            }
+
+            fecharModal() {
+                document.getElementById('modalExcluir').style.display = 'none';
+                this.funcionarioParaExcluir = null;
+            }
+
+            visualizarDocumentos(faltaId) {
+                const falta = this.faltas.find(f => f.id === faltaId);
+                if (!falta || !falta.documentos || falta.documentos.length === 0) return;
+                
+                const container = document.getElementById('documentosContainer');
+                container.innerHTML = '';
+                
+                falta.documentos.forEach(doc => {
+                    const div = document.createElement('div');
+                    div.style.margin = '10px 0';
+                    div.style.padding = '10px';
+                    div.style.background = '#f8f9fa';
+                    div.style.borderRadius = '5px';
+                    
+                    if (doc.tipo?.startsWith('image/')) {
+                        div.innerHTML = `
+                            <p><strong>${doc.nome}</strong></p>
+                            <img src="${doc.dataUrl}" style="max-width: 100%; max-height: 200px; border-radius: 5px;">
+                            <p style="font-size: 12px; color: #666;">${(doc.tamanho / 1024).toFixed(2)} KB</p>
+                        `;
+                    } else {
+                        div.innerHTML = `
+                            <p><strong>${doc.nome}</strong></p>
+                            <a href="${doc.dataUrl}" target="_blank" class="btn btn-sm btn-info">Abrir Documento</a>
+                            <p style="font-size: 12px; color: #666;">${(doc.tamanho / 1024).toFixed(2)} KB</p>
+                        `;
+                    }
+                    
+                    container.appendChild(div);
+                });
+                
+                document.getElementById('modalVisualizarDocs').style.display = 'block';
+            }
         }
 
         const sistema = new SistemaCompleto();
 
-        // ========== FUNÇÕES GLOBAIS ==========
         window.mudarTabLogin = (tab) => {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -3316,24 +3358,14 @@
         window.logout = () => sistema.logout();
         window.cadastrarFuncionario = () => sistema.cadastrarFuncionario();
         window.toggleFuncionarioStatus = (cpf) => sistema.toggleFuncionarioStatus(cpf);
-        window.filtrarRegistros = () => sistema.filtrarRegistros();
+        window.filtrarRegistros = () => sistema.atualizarTabelaRegistros();
         window.exportarCSV = () => sistema.exportarCSV();
         window.gerarPDF = () => sistema.gerarPDF();
         window.registrarFalta = () => sistema.registrarFalta();
         window.cadastrarFerias = () => sistema.cadastrarFerias();
         window.registrarLicenca = () => sistema.registrarLicenca();
         window.criarUsuario = () => sistema.criarUsuario();
-
-        window.confirmarExcluirFuncionario = (cpf, nome) => {
-            sistema.funcionarioParaExcluir = cpf;
-            document.getElementById('modalMensagem').textContent = `Excluir ${nome}?`;
-            document.getElementById('modalExcluir').style.display = 'block';
-        };
-
-        window.fecharModal = () => {
-            document.getElementById('modalExcluir').style.display = 'none';
-            sistema.funcionarioParaExcluir = null;
-        };
+        window.fecharModal = () => sistema.fecharModal();
 
         window.abrirModalRecuperar = (cpf, nome) => {
             sistema.abrirModalRecuperar(cpf, nome);
@@ -3346,7 +3378,7 @@
         document.getElementById('confirmarExcluir').onclick = () => {
             if (sistema.funcionarioParaExcluir) {
                 sistema.excluirFuncionario(sistema.funcionarioParaExcluir);
-                fecharModal();
+                sistema.fecharModal();
             }
         };
 
@@ -3365,7 +3397,7 @@
             const modalRec = document.getElementById('modalRecuperarSenha');
             const modalDocs = document.getElementById('modalVisualizarDocs');
             const modalCartorio = document.getElementById('modalEsqueciSenhaCartorio');
-            if (e.target === modal) fecharModal();
+            if (e.target === modal) sistema.fecharModal();
             if (e.target === modalRec) fecharModalRecuperar();
             if (e.target === modalDocs) fecharModalDocs();
             if (e.target === modalCartorio) fecharModalEsqueciSenhaCartorio();
